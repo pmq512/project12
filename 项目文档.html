@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>动漫流媒体平台项目文档</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; text-align: center; }
+        h2 { color: #555; margin-top: 30px; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .container { max-width: 1200px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>动漫流媒体平台项目文档</h1>
+        
+        <h2>项目概述</h2>
+        <p>本项目是一个基于Spring Boot的动漫流媒体平台，提供动漫的浏览、分类管理、用户注册登录等功能。</p>
+        
+        <h2>项目目标</h2>
+        <ul>
+            <li>1. 构建一个功能完整的动漫流媒体平台</li>
+            <li>2. 提供动漫的展示、分类和管理功能</li>
+            <li>3. 实现用户注册、登录和个人信息管理</li>
+            <li>4. 支持评论功能，增强用户互动</li>
+        </ul>
+        
+        <h2>技术栈</h2>
+        <table>
+            <tr>
+                <th>技术</th>
+                <th>版本</th>
+                <th>用途</th>
+            </tr>
+            <tr>
+                <td>Spring Boot</td>
+                <td>2.7.18</td>
+                <td>应用框架</td>
+            </tr>
+            <tr>
+                <td>Spring Data JPA</td>
+                <td>-</td>
+                <td>数据访问</td>
+            </tr>
+            <tr>
+                <td>H2 Database</td>
+                <td>-</td>
+                <td>内存数据库</td>
+            </tr>
+            <tr>
+                <td>Thymeleaf</td>
+                <td>-</td>
+                <td>模板引擎</td>
+            </tr>
+            <tr>
+                <td>Spring Web</td>
+                <td>-</td>
+                <td>Web框架</td>
+            </tr>
+            <tr>
+                <td>Spring Boot Actuator</td>
+                <td>-</td>
+                <td>应用监控</td>
+            </tr>
+        </table>
+        
+        <h2>核心功能模块</h2>
+        <table>
+            <tr>
+                <th>模块名称</th>
+                <th>功能描述</th>
+                <th>主要页面</th>
+                <th>核心功能</th>
+            </tr>
+            <tr>
+                <td>动漫管理</td>
+                <td>展示、添加、编辑、删除动漫</td>
+                <td>动漫列表页 (anime-list.html)、动漫详情页 (anime-view.html)、动漫编辑页 (anime-form.html)</td>
+                <td>动漫列表展示、按分类筛选动漫、动漫详情查看、动漫视频播放、动漫评论</td>
+            </tr>
+            <tr>
+                <td>分类管理</td>
+                <td>管理动漫分类</td>
+                <td>分类列表页 (category-list.html)、分类编辑页 (category-form.html)</td>
+                <td>分类列表展示、添加新分类、编辑分类信息、删除分类</td>
+            </tr>
+            <tr>
+                <td>用户管理</td>
+                <td>用户注册、登录、个人信息管理</td>
+                <td>登录页 (login.html)、注册页 (register.html)、个人资料页 (profile.html)</td>
+                <td>用户注册、用户登录、个人信息查看和编辑、退出登录</td>
+            </tr>
+        </table>
+        
+        <h2>数据初始化</h2>
+        <table>
+            <tr>
+                <th>数据类型</th>
+                <th>数量</th>
+                <th>内容</th>
+            </tr>
+            <tr>
+                <td>分类数据</td>
+                <td>15个</td>
+                <td>热血、冒险、科幻、奇幻、校园、恋爱、喜剧、悬疑、恐怖、魔法、机甲、推理、历史、体育、音乐</td>
+            </tr>
+            <tr>
+                <td>用户数据</td>
+                <td>2个</td>
+                <td>admin/admin123 (管理员)、user/user123 (普通用户)</td>
+            </tr>
+            <tr>
+                <td>动漫数据</td>
+                <td>18个</td>
+                <td>覆盖各个分类的示例动漫</td>
+            </tr>
+        </table>
+        
+        <h2>API接口</h2>
+        
+        <h3>动漫相关接口</h3>
+        <table>
+            <tr>
+                <th>HTTP方法</th>
+                <th>路径</th>
+                <th>功能描述</th>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/anime/</td>
+                <td>查看动漫列表</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/anime/{id}</td>
+                <td>查看动漫详情</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/anime/new</td>
+                <td>进入添加动漫页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/anime/</td>
+                <td>添加新动漫</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/anime/edit/{id}</td>
+                <td>进入编辑动漫页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/anime/{id}</td>
+                <td>更新动漫信息</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/anime/delete/{id}</td>
+                <td>删除动漫</td>
+            </tr>
+        </table>
+        
+        <h3>分类相关接口</h3>
+        <table>
+            <tr>
+                <th>HTTP方法</th>
+                <th>路径</th>
+                <th>功能描述</th>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/category/</td>
+                <td>查看分类列表</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/category/new</td>
+                <td>进入添加分类页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/category/</td>
+                <td>添加新分类</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/category/edit/{id}</td>
+                <td>进入编辑分类页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/category/{id}</td>
+                <td>更新分类信息</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/category/delete/{id}</td>
+                <td>删除分类</td>
+            </tr>
+        </table>
+        
+        <h3>用户相关接口</h3>
+        <table>
+            <tr>
+                <th>HTTP方法</th>
+                <th>路径</th>
+                <th>功能描述</th>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/login</td>
+                <td>进入登录页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/login</td>
+                <td>用户登录</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/logout</td>
+                <td>用户登出</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/user/register</td>
+                <td>进入注册页面</td>
+            </tr>
+            <tr>
+                <td>POST</td>
+                <td>/user/register</td>
+                <td>用户注册</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/user/profile</td>
+                <td>查看个人资料</td>
+            </tr>
+        </table>
+        
+        <h2>访问地址</h2>
+        <table>
+            <tr>
+                <th>页面名称</th>
+                <th>访问地址</th>
+            </tr>
+            <tr>
+                <td>应用首页</td>
+                <td>http://localhost:8085/anime/</td>
+            </tr>
+            <tr>
+                <td>分类管理</td>
+                <td>http://localhost:8085/category/</td>
+            </tr>
+            <tr>
+                <td>登录页面</td>
+                <td>http://localhost:8085/login</td>
+            </tr>
+            <tr>
+                <td>注册页面</td>
+                <td>http://localhost:8085/user/register</td>
+            </tr>
+        </table>
+        
+        <h2>环境要求</h2>
+        <table>
+            <tr>
+                <th>环境</th>
+                <th>版本要求</th>
+            </tr>
+            <tr>
+                <td>JDK</td>
+                <td>1.8或更高版本</td>
+            </tr>
+            <tr>
+                <td>Maven</td>
+                <td>3.6或更高版本</td>
+            </tr>
+        </table>
+        
+        <h2>测试账号</h2>
+        <table>
+            <tr>
+                <th>账号类型</th>
+                <th>用户名</th>
+                <th>密码</th>
+            </tr>
+            <tr>
+                <td>管理员账号</td>
+                <td>admin</td>
+                <td>admin123</td>
+            </tr>
+            <tr>
+                <td>普通用户账号</td>
+                <td>user</td>
+                <td>user123</td>
+            </tr>
+        </table>
+        
+        <h2>项目特点</h2>
+        <table>
+            <tr>
+                <th>特点</th>
+                <th>描述</th>
+            </tr>
+            <tr>
+                <td>完整的CRUD操作</td>
+                <td>支持动漫和分类的增删改查</td>
+            </tr>
+            <tr>
+                <td>用户认证系统</td>
+                <td>实现了用户注册、登录和权限管理</td>
+            </tr>
+            <tr>
+                <td>响应式设计</td>
+                <td>使用Bootstrap实现响应式界面</td>
+            </tr>
+            <tr>
+                <td>数据初始化</td>
+                <td>自动加载示例数据，方便测试</td>
+            </tr>
+            <tr>
+                <td>内存数据库</td>
+                <td>使用H2内存数据库，无需额外配置</td>
+            </tr>
+            <tr>
+                <td>模块化结构</td>
+                <td>清晰的分层架构，易于维护和扩展</td>
+            </tr>
+        </table>
+        
+        <h2>未来扩展方向</h2>
+        <table>
+            <tr>
+                <th>功能模块</th>
+                <th>功能描述</th>
+                <th>优先级</th>
+                <th>技术实现建议</th>
+            </tr>
+            <tr>
+                <td>视频上传功能</td>
+                <td>支持用户上传视频文件</td>
+                <td>高</td>
+                <td>使用Spring Boot的MultipartFile和文件存储服务</td>
+            </tr>
+            <tr>
+                <td>用户评分系统</td>
+                <td>允许用户对动漫进行评分</td>
+                <td>高</td>
+                <td>添加评分实体和评分接口</td>
+            </tr>
+            <tr>
+                <td>收藏功能</td>
+                <td>用户可以收藏喜欢的动漫</td>
+                <td>高</td>
+                <td>添加收藏实体和相关接口</td>
+            </tr>
+            <tr>
+                <td>搜索功能</td>
+                <td>支持按标题、分类等条件搜索</td>
+                <td>高</td>
+                <td>使用Spring Data JPA的查询方法或全文搜索</td>
+            </tr>
+            <tr>
+                <td>多语言支持</td>
+                <td>添加国际化支持</td>
+                <td>中</td>
+                <td>使用Spring Boot的国际化功能</td>
+            </tr>
+            <tr>
+                <td>后台管理系统</td>
+                <td>更完善的后台管理功能</td>
+                <td>中</td>
+                <td>开发专门的后台管理模块</td>
+            </tr>
+            <tr>
+                <td>推荐系统</td>
+                <td>基于用户喜好推荐动漫</td>
+                <td>中</td>
+                <td>使用简单的协同过滤算法</td>
+            </tr>
+            <tr>
+                <td>社交功能</td>
+                <td>用户之间的互动和分享</td>
+                <td>中</td>
+                <td>添加用户关注、消息通知等功能</td>
+            </tr>
+            <tr>
+                <td>弹幕系统</td>
+                <td>支持视频弹幕功能</td>
+                <td>中</td>
+                <td>前端实现弹幕渲染，后端存储弹幕数据</td>
+            </tr>
+            <tr>
+                <td>会员系统</td>
+                <td>提供会员特权和付费内容</td>
+                <td>低</td>
+                <td>添加会员等级和支付接口</td>
+            </tr>
+            <tr>
+                <td>移动端适配</td>
+                <td>开发移动端适配的界面</td>
+                <td>低</td>
+                <td>使用响应式设计或开发移动应用</td>
+            </tr>
+            <tr>
+                <td>数据分析</td>
+                <td>提供用户行为和内容分析</td>
+                <td>低</td>
+                <td>集成数据分析工具</td>
+            </tr>
+            <tr>
+                <td>多格式支持</td>
+                <td>支持多种视频格式和清晰度</td>
+                <td>低</td>
+                <td>集成视频转码服务</td>
+            </tr>
+            <tr>
+                <td>社区功能</td>
+                <td>动漫讨论区和论坛</td>
+                <td>低</td>
+                <td>开发社区模块和话题功能</td>
+            </tr>
+            <tr>
+                <td>API接口</td>
+                <td>提供RESTful API接口</td>
+                <td>低</td>
+                <td>开发API模块和文档</td>
+            </tr>
+        </table>
+        
+        <h2>技术难点与解决方案</h2>
+        <table>
+            <tr>
+                <th>技术难点</th>
+                <th>解决方案</th>
+            </tr>
+            <tr>
+                <td>视频播放集成</td>
+                <td>使用HTML5 video标签和YouTube嵌入链接</td>
+            </tr>
+            <tr>
+                <td>用户认证</td>
+                <td>使用Spring Security实现安全认证</td>
+            </tr>
+            <tr>
+                <td>数据管理</td>
+                <td>使用Spring Data JPA和H2数据库</td>
+            </tr>
+            <tr>
+                <td>响应式设计</td>
+                <td>使用Bootstrap框架实现响应式布局</td>
+            </tr>
+            <tr>
+                <td>视频上传和处理</td>
+                <td>使用文件存储服务和视频转码工具</td>
+            </tr>
+            <tr>
+                <td>实时弹幕</td>
+                <td>使用WebSocket实现实时通信</td>
+            </tr>
+            <tr>
+                <td>推荐系统</td>
+                <td>使用协同过滤或内容推荐算法</td>
+            </tr>
+            <tr>
+                <td>高并发处理</td>
+                <td>使用缓存和异步处理技术</td>
+            </tr>
+        </table>
+        
+        <h2>项目总结</h2>
+        <p>本项目是一个功能完整的动漫流媒体平台，基于Spring Boot框架开发，使用了现代Java Web开发技术栈。项目实现了动漫管理、分类管理、用户管理等核心功能，并提供了良好的用户体验。</p>
+        <p>项目采用了清晰的分层架构，代码结构合理，易于维护和扩展。通过使用Spring Boot、Spring Data JPA、Thymeleaf等技术，实现了一个功能丰富、性能良好的Web应用。</p>
+        <p>未来可以通过添加表格中列出的扩展功能，进一步提升平台的用户体验和功能完整性。</p>
+    </div>
+</body>
+</html>
