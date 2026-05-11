@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加/编辑动漫</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/anime/">动漫流媒体</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/anime/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/category/">分类管理</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1 th:if="${anime.id == null}">添加动漫</h1>
+        <h1 th:if="${anime.id != null}">编辑动漫</h1>
+        <form th:action="@{/anime/save}" th:object="${anime}" method="post" class="mt-4">
+            <input type="hidden" th:field="*{id}">
+            <div class="form-group">
+                <label for="title">标题</label>
+                <input type="text" id="title" th:field="*{title}" class="form-control" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="description">描述</label>
+                <textarea id="description" th:field="*{description}" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group mt-3">
+                <label for="category">分类</label>
+                <select id="category" th:field="*{category.id}" class="form-control">
+                    <option value="">请选择分类</option>
+                    <option th:each="category : ${categories}" 
+                            th:value="${category.id}" 
+                            th:text="${category.name}"></option>
+                </select>
+            </div>
+            <div class="form-group mt-3">
+                <label for="coverImage">封面图片 URL</label>
+                <input type="text" id="coverImage" th:field="*{coverImage}" class="form-control" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="videoUrl">视频链接</label>
+                <input type="text" id="videoUrl" th:field="*{videoUrl}" class="form-control" required>
+                <small class="form-text text-muted">支持B站、YouTube、优酷、腾讯视频等任意视频网站链接</small>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <a href="/anime/" class="btn btn-secondary ml-2">取消</a>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
