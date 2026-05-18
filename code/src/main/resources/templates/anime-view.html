@@ -2,8 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>观看动漫</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{title.anime.view}">观看动漫</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/mobile-responsive.css">
     <style>
         .video-container {
             position: relative;
@@ -17,6 +19,76 @@
             left: 0;
             width: 100%;
             height: 100%;
+        }
+        .danmaku-stage {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .danmaku-stage .danmaku-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .danmaku-stage .danmaku-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 10px 20px;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .danmaku-item {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            animation: danmaku-scroll linear forwards;
+            pointer-events: none;
+        }
+        @keyframes danmaku-scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+        .danmaku-item.top { top: 10%; }
+        .danmaku-item.mid { top: 40%; }
+        .danmaku-item.bot { top: 70%; }
+        .danmaku-controls {
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        .danmaku-controls .color-picker {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .danmaku-controls .color-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .danmaku-controls .color-dot.active {
+            border-color: #000;
         }
         .comment {
             margin-bottom: 20px;
@@ -42,52 +114,67 @@
     <!-- 导航栏 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/anime/">动漫流媒体</a>
-            <div class="collapse navbar-collapse">
+            <a class="navbar-brand" href="/anime/" th:text="#{title.home}">动漫流媒体</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/anime/">首页</a>
+                        <a class="nav-link" href="/anime/" th:text="#{nav.home}">首页</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/category/">分类管理</a>
+                        <a class="nav-link" href="/category/" th:text="#{nav.category}">分类管理</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/favorite/list">我的收藏</a>
+                    <li th:if="${isLoggedIn}" class="nav-item">
+                        <a class="nav-link" href="/favorite/list" th:text="#{nav.favorite}">我的收藏</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     <div th:if="${isLoggedIn}">
                         <li class="nav-item">
-                            <span class="nav-link text-light">欢迎，<span th:text="${currentUser?.username}"></span>！</span>
+                            <span class="nav-link text-light" th:text="#{user.welcome} + '，' + ${currentUser?.username} + '！'">欢迎，用户！</span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/user/profile">个人资料</a>
+                            <a class="nav-link" href="/user/profile" th:text="#{nav.profile}">个人资料</a>
+                        </li>
+                        <li th:if="${currentUser?.role == 'ADMIN'}" class="nav-item">
+                            <a class="nav-link" href="/admin/" th:text="#{nav.admin}">后台管理</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">退出登录</a>
+                            <a class="nav-link" href="/logout" th:text="#{nav.logout}">退出登录</a>
                         </li>
                     </div>
                     <div th:if="${!isLoggedIn}">
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">登录</a>
+                            <a class="nav-link" href="/login" th:text="#{nav.login}">登录</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/user/register">注册</a>
+                            <a class="nav-link" href="/user/register" th:text="#{nav.register}">注册</a>
                         </li>
                     </div>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <span th:text="#{nav.lang}">语言</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?lang=zh_CN">中文</a></li>
+                            <li><a class="dropdown-item" href="?lang=en">English</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
     
     <div class="container mt-4">
-        <a href="/anime/" class="btn btn-secondary mb-4">返回列表</a>
+        <a href="/anime/" class="btn btn-secondary mb-4" th:text="#{btn.back}">返回列表</a>
         <div class="row">
             <div class="col-md-8">
                 <h1 th:text="${anime.title}"></h1>
                 <p class="text-muted" th:text="${anime.description}"></p>
                 <p class="text-muted" th:if="${anime.category != null}">
-                    分类：<span th:text="${anime.category.name}"></span>
+                    <span th:text="#{label.category}"></span>：<span th:text="${anime.category.name}"></span>
                 </p>
                 
                 <!-- 评分和收藏区域 -->
@@ -95,21 +182,21 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <!-- 评分显示 -->
                         <div>
-                            <span class="text-lg">评分：</span>
+                            <span class="text-lg" th:text="#{label.rating}"></span>：
                             <span class="text-2xl font-bold text-warning" th:text="${averageRating}"></span>
                             <span class="text-muted">/ 5.0</span>
-                            <span class="text-muted ml-2" th:text="${ratingCount} + '人评分'"></span>
+                            <span class="text-muted ml-2" th:text="${ratingCount} + #{label.rating.count}"></span>
                         </div>
                         
                         <!-- 收藏按钮 -->
                         <form th:if="${!isFavorite}" th:action="@{/favorite/add/{animeId}(animeId=${anime.id})}" method="post" class="d-inline">
                             <button type="submit" class="btn btn-outline-danger">
-                                <span>❤️</span> 收藏
+                                <span>❤️</span> <span th:text="#{btn.favorite}">收藏</span>
                             </button>
                         </form>
                         <form th:if="${isFavorite}" th:action="@{/favorite/remove/{animeId}(animeId=${anime.id})}" method="post" class="d-inline">
                             <button type="submit" class="btn btn-danger">
-                                <span>❤️</span> 已收藏
+                                <span>❤️</span> <span th:text="#{btn.favorited}">已收藏</span>
                             </button>
                         </form>
                     </div>
@@ -117,7 +204,7 @@
                     <!-- 评分表单 -->
                     <div class="mt-4">
                         <form th:action="@{/rating/add/{animeId}(animeId=${anime.id})}" method="post">
-                            <label class="mr-2">我来评分：</label>
+                            <label class="mr-2" th:text="#{label.my.rating}"></label>
                             <div class="btn-group" role="group">
                                 <button type="submit" name="score" value="1" class="btn btn-outline-primary">1</button>
                                 <button type="submit" name="score" value="2" class="btn btn-outline-primary">2</button>
@@ -133,31 +220,82 @@
                         <iframe th:src="${videoUrl}" frameborder="0" allowfullscreen></iframe>
                     </div>
                     <div th:unless="${isEmbedUrl}" class="text-center py-10 bg-gray-100 rounded-lg">
-                        <p class="text-lg text-gray-600 mb-4">点击下方按钮跳转到视频网站观看</p>
+                        <p class="text-lg text-gray-600 mb-4" th:text="#{label.watch.hint}"></p>
                         <a th:href="${videoUrl}" target="_blank" class="btn btn-primary btn-lg">
-                            <span class="glyphicon glyphicon-play"></span> 观看视频
+                            <span class="glyphicon glyphicon-play"></span> <span th:text="#{btn.watch}">观看视频</span>
                         </a>
                     </div>
                 </div>
+
+                <div th:if="${videoSources != null and !videoSources.isEmpty()}" class="mt-3">
+                    <div class="card">
+                        <div class="card-header"><strong>视频源选择</strong></div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div th:each="vs : ${videoSources}" class="col-md-3 mb-2">
+                                    <a th:href="${vs.url}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                        <span th:text="${vs.label}">源</span>
+                                        <span class="badge bg-secondary ms-1" th:text="${vs.quality}"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
+                <!-- 弹幕区 -->
+                <div class="mt-4">
+                    <h4>弹幕 <small class="text-muted" id="danmakuCount">0条</small></h4>
+                    <div class="danmaku-stage" id="danmakuStage">
+                        <div class="danmaku-layer" id="danmakuLayer"></div>
+                        <div class="danmaku-info">
+                            <span>弹幕播放器</span>
+                            <span id="danmakuTimer">00:00</span>
+                        </div>
+                    </div>
+                    <div class="danmaku-controls" th:if="${isLoggedIn}">
+                        <div class="row align-items-end">
+                            <div class="col-md-6">
+                                <input type="text" id="danmakuInput" class="form-control" placeholder="输入弹幕内容，按Enter发送..." maxlength="50">
+                            </div>
+                            <div class="col-md-3">
+                                <div class="color-picker">
+                                    <span class="color-dot active" style="background:#FFFFFF" data-color="#FFFFFF" title="白色"></span>
+                                    <span class="color-dot" style="background:#FF0000" data-color="#FF0000" title="红色"></span>
+                                    <span class="color-dot" style="background:#00FF00" data-color="#00FF00" title="绿色"></span>
+                                    <span class="color-dot" style="background:#FFFF00" data-color="#FFFF00" title="黄色"></span>
+                                    <span class="color-dot" style="background:#00BFFF" data-color="#00BFFF" title="蓝色"></span>
+                                    <span class="color-dot" style="background:#FF69B4" data-color="#FF69B4" title="粉色"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <button id="danmakuSendBtn" class="btn btn-primary btn-sm w-100">发送弹幕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${!isLoggedIn}" class="text-muted mt-2">
+                        <small>请 <a href="/login">登录</a> 后发送弹幕</small>
+                    </div>
+                </div>
+
                 <!-- 评论区 -->
                 <div class="mt-6">
-                    <h3>评论</h3>
+                    <h3 th:text="#{label.comments}">评论</h3>
                     
                     <!-- 评论表单 -->
                     <div th:if="${isLoggedIn}">
                         <div class="mb-4">
                             <form th:action="@{/anime/comment/{animeId}(animeId=${anime.id})}" method="post">
                                 <div class="form-group">
-                                    <label for="content">发表评论</label>
+                                    <label for="content" th:text="#{label.comment}"></label>
                                     <textarea id="content" name="content" class="form-control" rows="3" required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary mt-2">发布评论</button>
+                                <button type="submit" class="btn btn-primary mt-2" th:text="#{btn.submit}">发布评论</button>
                             </form>
                         </div>
                     </div>
                     <div th:if="${!isLoggedIn}">
-                        <p>请 <a href="/login">登录</a> 后发表评论</p>
+                        <p th:text="#{label.login.to.comment}">请 <a href="/login" th:text="#{nav.login}">登录</a> 后发表评论</p>
                     </div>
                     
                     <!-- 评论列表 -->
@@ -170,7 +308,7 @@
                             <div class="comment-content" th:text="${comment.content}"></div>
                         </div>
                         <div th:if="${comments.size() == 0}" class="text-muted">
-                            暂无评论，快来发表第一条评论吧！
+                            <p th:text="#{label.no.comments}">暂无评论，快来发表第一条评论吧！</p>
                         </div>
                     </div>
                 </div>
@@ -181,5 +319,112 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        var animeId = /*[[${anime.id}]]*/ 0;
+        var danmakuColor = '#FFFFFF';
+        var danmakuTimer = 0;
+        var timerInterval = null;
+
+        var colorDots = document.querySelectorAll('.color-dot');
+        colorDots.forEach(function(dot) {
+            dot.addEventListener('click', function() {
+                colorDots.forEach(function(d) { d.classList.remove('active'); });
+                this.classList.add('active');
+                danmakuColor = this.getAttribute('data-color');
+            });
+        });
+
+        function startDanmakuTimer() {
+            timerInterval = setInterval(function() {
+                danmakuTimer += 0.1;
+                var mins = Math.floor(danmakuTimer / 60);
+                var secs = Math.floor(danmakuTimer % 60);
+                document.getElementById('danmakuTimer').textContent =
+                    (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+            }, 100);
+        }
+
+        function loadDanmaku() {
+            fetch('/api/danmaku/' + animeId)
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    document.getElementById('danmakuCount').textContent = data.length + '条';
+                    data.forEach(function(d) {
+                        scheduleDanmaku(d.content, d.color, d.time);
+                    });
+                });
+        }
+
+        function scheduleDanmaku(content, color, delay) {
+            setTimeout(function() {
+                addDanmakuItem(content, color);
+            }, (delay || 0) * 1000);
+        }
+
+        function addDanmakuItem(content, color) {
+            var layer = document.getElementById('danmakuLayer');
+            var el = document.createElement('div');
+            el.className = 'danmaku-item';
+            el.textContent = content;
+            el.style.color = color;
+
+            var positions = ['top', 'mid', 'bot'];
+            var pos = positions[Math.floor(Math.random() * positions.length)];
+            el.classList.add(pos);
+
+            var duration = Math.max(4, content.length * 0.3 + 3);
+            el.style.animationDuration = duration + 's';
+            el.style.right = '0';
+
+            layer.appendChild(el);
+
+            el.addEventListener('animationend', function() {
+                el.remove();
+            });
+        }
+
+        function sendDanmaku() {
+            var input = document.getElementById('danmakuInput');
+            var content = input.value.trim();
+            if (!content) return;
+
+            var formData = new FormData();
+            formData.append('content', content);
+            formData.append('time', danmakuTimer);
+            formData.append('color', danmakuColor);
+            formData.append('type', 'scroll');
+
+            fetch('/api/danmaku/' + animeId, {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    addDanmakuItem(data.content, data.color);
+                    var countEl = document.getElementById('danmakuCount');
+                    var current = parseInt(countEl.textContent) || 0;
+                    countEl.textContent = (current + 1) + '条';
+                }
+            });
+
+            input.value = '';
+        }
+
+        document.getElementById('danmakuInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendDanmaku();
+            }
+        });
+
+        var sendBtn = document.getElementById('danmakuSendBtn');
+        if (sendBtn) {
+            sendBtn.addEventListener('click', sendDanmaku);
+        }
+
+        startDanmakuTimer();
+        loadDanmaku();
+    </script>
 </body>
 </html>

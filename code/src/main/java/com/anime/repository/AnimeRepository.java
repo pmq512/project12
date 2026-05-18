@@ -21,4 +21,6 @@ public interface AnimeRepository extends JpaRepository<Anime, Long> {
     
     @Query("SELECT a FROM Anime a WHERE (a.title LIKE %:keyword% OR a.description LIKE %:keyword%) AND a.category.id = :categoryId")
     List<Anime> searchByKeywordAndCategory(@Param("keyword") String keyword, @Param("categoryId") Long categoryId);
+    
+    List<Anime> findAllByOrderByIdDesc();
 }

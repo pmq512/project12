@@ -4,13 +4,16 @@ import com.anime.entity.Anime;
 import com.anime.entity.Category;
 import com.anime.entity.Comment;
 import com.anime.entity.User;
+import com.anime.service.AnalyticsService;
 import com.anime.service.AnimeService;
 import com.anime.service.CategoryService;
 import com.anime.service.CommentService;
 import com.anime.service.UserService;
 import com.anime.service.VideoService;
+import com.anime.service.VideoSourceService;
 import com.anime.service.RatingService;
 import com.anime.service.FavoriteService;
+import com.anime.service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Controller;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/anime")
@@ -43,6 +47,15 @@ public class AnimeController {
     
     @Autowired
     private FavoriteService favoriteService;
+    
+    @Autowired
+    private RecommendationService recommendationService;
+
+    @Autowired
+    private AnalyticsService analyticsService;
+
+    @Autowired
+    private VideoSourceService videoSourceService;
 
     @GetMapping("/")
     public String listAnime(@RequestParam(value = "categoryId", required = false) Long categoryId,
@@ -74,6 +87,16 @@ public class AnimeController {
                 model.addAttribute("animes", animeService.getAllAnime());
             }
         }
+        
+        // 添加推荐数据
+        List<Anime> recommendations;
+        if (user != null) {
+            recommendations = recommendationService.getRecommendations(user.getId(), 6);
+        } else {
+            recommendations = recommendationService.getRecommendationsForGuest(6);
+        }
+        model.addAttribute("recommendations", recommendations);
+        
         return "anime-list";
     }
 
@@ -83,15 +106,14 @@ public class AnimeController {
         String processedUrl = videoService.processVideoUrl(anime.getVideoUrl());
         boolean isEmbed = videoService.isEmbedUrl(processedUrl);
         
-        // 获取评分信息
         double averageRating = ratingService.getAverageRating(anime);
         int ratingCount = ratingService.getRatingCount(anime);
         
-        // 获取收藏状态
         User user = (User) session.getAttribute("user");
         boolean isFavorite = false;
         if (user != null) {
             isFavorite = favoriteService.isFavorite(user, anime);
+            analyticsService.recordView(user, anime);
         }
         
         model.addAttribute("anime", anime);
@@ -103,13 +125,13 @@ public class AnimeController {
         model.addAttribute("comments", commentService.getCommentsByAnimeId(id));
         model.addAttribute("isLoggedIn", user != null);
         model.addAttribute("currentUser", user);
+        model.addAttribute("videoSources", videoSourceService.getVideoSourcesByAnime(anime));
         return "anime-view";
     }
     
     @PostMapping("/comment/{animeId}")
     public String addComment(@PathVariable Long animeId, @RequestParam String content, 
                             RedirectAttributes redirectAttributes) {
-        // 暂时使用一个默认用户，实际应用中需要根据登录状态获取用户信息
         User user = new User();
         user.setUsername("guest");
         

@@ -140,4 +140,28 @@ public class VideoUrlParser {
         return url.contains("embed") || url.contains("player.bilibili.com") || 
                url.contains("player.youku.com") || url.contains("iframe") || url.contains("txp/iframe");
     }
+
+    public static boolean isDirectVideoUrl(String url) {
+        if (url == null) return false;
+        String lower = url.toLowerCase();
+        return lower.endsWith(".mp4") || lower.endsWith(".webm") || 
+               lower.endsWith(".ogg") || lower.endsWith(".mov") ||
+               lower.contains(".m3u8");
+    }
+
+    public static String detectFormat(String url) {
+        if (url == null) return "unknown";
+        String lower = url.toLowerCase();
+        if (lower.endsWith(".mp4")) return "MP4";
+        if (lower.endsWith(".webm")) return "WebM";
+        if (lower.endsWith(".ogg")) return "OGG";
+        if (lower.endsWith(".mov")) return "MOV";
+        if (lower.contains(".m3u8")) return "HLS";
+        if (lower.contains("bilibili")) return "B站";
+        if (lower.contains("youtube") || lower.contains("youtu.be")) return "YouTube";
+        if (lower.contains("youku")) return "优酷";
+        if (lower.contains("v.qq.com")) return "腾讯视频";
+        if (lower.contains("iqiyi")) return "爱奇艺";
+        return "其他";
+    }
 }
