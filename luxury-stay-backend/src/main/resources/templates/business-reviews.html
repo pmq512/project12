@@ -1,0 +1,149 @@
+<div th:fragment="content" class="font-sans">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+            <p class="stat-label">待审核评论</p>
+            <div class="stat-value" th:text="${pendingReviews.size()}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span>需要审核</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+            <p class="stat-label">已通过评论</p>
+            <div class="stat-value" th:text="${approvedReviews.size()}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-check"></i>
+                <span>审核通过</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+            </div>
+            <p class="stat-label">已拒绝评论</p>
+            <div class="stat-value" th:text="${rejectedReviews.size()}">0</div>
+            <div class="stat-change negative">
+                <i class="bi bi-x"></i>
+                <span>审核拒绝</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-table" th:if="${!pendingReviews.isEmpty()}">
+        <div class="data-table-header">
+            <h5><i class="bi bi-clock"></i>待审核评论</h5>
+        </div>
+        <div class="review-list">
+            <div th:each="review : ${pendingReviews}" class="review-item">
+                <div class="review-header">
+                    <div class="review-info">
+                        <h6 th:text="${review.hotelName}">酒店名称</h6>
+                        <div class="rating-stars">
+                            <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                               th:class="${i <= review.rating ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                        </div>
+                    </div>
+                    <div class="review-actions">
+                        <a th:href="@{/business/reviews/{id}/approve(id=${review.id})}" 
+                           class="btn-action btn-success">
+                            <i class="bi bi-check"></i>通过
+                        </a>
+                        <a th:href="@{/business/reviews/{id}/reject(id=${review.id})}" 
+                           class="btn-action btn-danger">
+                            <i class="bi bi-x"></i>拒绝
+                        </a>
+                    </div>
+                </div>
+                <h5 class="review-title" th:text="${review.title}">评论标题</h5>
+                <p class="review-content" th:text="${review.content}">评论内容</p>
+                <div class="review-meta">
+                    <span class="review-author">评论者: <span th:text="${review.userName}">用户</span></span>
+                    <span class="review-date">评论时间: <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">时间</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-table" th:if="${!approvedReviews.isEmpty()}">
+        <div class="data-table-header">
+            <h5><i class="bi bi-check-circle"></i>已通过评论</h5>
+        </div>
+        <div class="review-list">
+            <div th:each="review : ${approvedReviews}" class="review-item">
+                <div class="review-header">
+                    <div class="review-info">
+                        <h6 th:text="${review.hotelName}">酒店名称</h6>
+                        <div class="rating-stars">
+                            <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                               th:class="${i <= review.rating ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                        </div>
+                    </div>
+                    <span class="status-badge status-approved">已通过</span>
+                </div>
+                <h5 class="review-title" th:text="${review.title}">评论标题</h5>
+                <p class="review-content" th:text="${review.content}">评论内容</p>
+                <div th:if="${review.businessReply != null and !review.businessReply.isEmpty()}" class="review-reply">
+                    <div class="review-reply-header">
+                        <span class="reply-badge">商家回复</span>
+                        <span th:text="${#temporals.format(review.replyAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                    <p class="review-reply-content" th:text="${review.businessReply}">商家回复内容</p>
+                </div>
+                <form th:action="@{/business/reviews/{id}/reply(id=${review.id})}" method="post" class="reply-form">
+                    <textarea name="replyContent" placeholder="输入回复内容..." required></textarea>
+                    <button type="submit" class="btn-action btn-primary">
+                        <i class="bi bi-reply"></i>回复
+                    </button>
+                </form>
+                <div class="review-meta">
+                    <span class="review-author">评论者: <span th:text="${review.userName}">用户</span></span>
+                    <span class="review-date">评论时间: <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">时间</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-table" th:if="${!rejectedReviews.isEmpty()}">
+        <div class="data-table-header">
+            <h5><i class="bi bi-x-circle"></i>已拒绝评论</h5>
+        </div>
+        <div class="review-list">
+            <div th:each="review : ${rejectedReviews}" class="review-item">
+                <div class="review-header">
+                    <div class="review-info">
+                        <h6 th:text="${review.hotelName}">酒店名称</h6>
+                        <div class="rating-stars">
+                            <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                               th:class="${i <= review.rating ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                        </div>
+                    </div>
+                    <span class="status-badge status-rejected">已拒绝</span>
+                </div>
+                <h5 class="review-title" th:text="${review.title}">评论标题</h5>
+                <p class="review-content" th:text="${review.content}">评论内容</p>
+                <div class="review-meta">
+                    <span class="review-author">评论者: <span th:text="${review.userName}">用户</span></span>
+                    <span class="review-date">评论时间: <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">时间</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" th:if="${pendingReviews.isEmpty() && approvedReviews.isEmpty() && rejectedReviews.isEmpty()}">
+        <i class="bi bi-chat-dots"></i>
+        <h5>暂无评论</h5>
+        <p>还没有任何评论记录</p>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:sqlite:./example_db.sqlite
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+
+jwt:
+  secret: luxury-stay-jwt-secret-key-2026-06-15
+  expiration: 86400000
+
+logging:
+  level:
+    com.example.luxurystay: DEBUG
+    org.springframework.security: INFO
+  file:
+    name: ./logs/app.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 7
+      total-size-cap: 100MB

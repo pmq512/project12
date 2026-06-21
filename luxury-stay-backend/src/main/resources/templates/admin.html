@@ -1,0 +1,192 @@
+<div th:fragment="content" class="font-sans">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">待处理纠纷</span>
+                <div class="stat-icon"><i class="bi bi-clipboard-alert"></i></div>
+            </div>
+            <div class="stat-value" th:text="${pendingDisputes}">0</div>
+            <div class="stat-change positive" th:if="${pendingDisputes == 0}">
+                <i class="bi bi-check-circle"></i> 全部已处理
+            </div>
+            <div class="stat-change negative" th:if="${pendingDisputes > 0}">
+                <i class="bi bi-exclamation-triangle"></i> 需要处理
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">订单总数</span>
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+            </div>
+            <div class="stat-value" th:text="${totalBookings}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +15.2% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">酒店总数</span>
+                <div class="stat-icon"><i class="bi bi-hotel"></i></div>
+            </div>
+            <div class="stat-value" th:text="${totalHotels}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +8.7% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">用户总数</span>
+                <div class="stat-icon"><i class="bi bi-users"></i></div>
+            </div>
+            <div class="stat-value" th:text="${totalUsers}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +12.3% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">平台总营收</span>
+                <div class="stat-icon"><i class="bi bi-bank"></i></div>
+            </div>
+            <div class="stat-value">¥<span th:text="${totalRevenue}">0</span></div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +15.2% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">平台抽成</span>
+                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+            </div>
+            <div class="stat-value">¥<span th:text="${totalCommission}">0</span></div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +10.5% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">商家分成</span>
+                <div class="stat-icon"><i class="bi bi-wallet"></i></div>
+            </div>
+            <div class="stat-value">¥<span th:text="${totalBusinessIncome}">0</span></div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i> +8.3% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">已拉黑商家</span>
+                <div class="stat-icon"><i class="bi bi-shield-x"></i></div>
+            </div>
+            <div class="stat-value" th:text="${blacklistedBusinesses}">0</div>
+            <div class="stat-change positive" th:if="${blacklistedBusinesses == 0}">
+                <i class="bi bi-check-circle"></i> 全部正常
+            </div>
+            <div class="stat-change negative" th:if="${blacklistedBusinesses > 0}">
+                <i class="bi bi-exclamation-triangle"></i> 需关注
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 32px; margin-top: 40px;">
+        <div class="data-table">
+            <div class="data-table-header">
+                <h5><i class="bi bi-exclamation-circle"></i> 待处理纠纷</h5>
+                <a href="/admin/disputes" class="btn-action btn-primary">
+                    <i class="bi bi-arrow-right"></i> 处理纠纷
+                </a>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>纠纷ID</th>
+                        <th>订单号</th>
+                        <th>申请人</th>
+                        <th>申请类型</th>
+                        <th>申请时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="dispute : ${recentDisputes}">
+                        <td>#<span th:text="${dispute.id}"></span></td>
+                        <td>#<span th:text="${dispute.bookingId}"></span></td>
+                        <td th:text="${dispute.applicantType == 'USER' ? '用户' : '商家'}"></td>
+                        <td>
+                            <span class="status-badge status-pending">待处理</span>
+                        </td>
+                        <td th:text="${dispute.createdAt}"></td>
+                        <td>
+                            <a th:href="@{/admin/disputes/{id}(id=${dispute.id})}" class="btn-action btn-info">
+                                <i class="bi bi-eye"></i> 查看详情
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${recentDisputes.isEmpty()}">
+                        <td colspan="6" class="empty-state">
+                            <i class="bi bi-check-circle"></i>
+                            <h5>暂无待处理纠纷</h5>
+                            <p>所有纠纷均已处理完毕</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-table">
+            <div class="data-table-header">
+                <h5><i class="bi bi-bar-chart"></i> 快速统计</h5>
+            </div>
+            <div style="padding: 32px;">
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="stat-label">纠纷处理率</span>
+                        <span style="font-weight: 700; font-family: 'Inter', sans-serif; color: var(--text-primary); font-size: 1.1rem;">87%</span>
+                    </div>
+                    <div style="height: 8px; border-radius: 10px; background: rgba(212, 175, 55, 0.1); overflow: hidden;">
+                        <div style="width: 87%; height: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); border-radius: 10px; transition: width 0.8s ease;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="stat-label">评论审核率</span>
+                        <span style="font-weight: 700; font-family: 'Inter', sans-serif; color: var(--text-primary); font-size: 1.1rem;">94%</span>
+                    </div>
+                    <div style="height: 8px; border-radius: 10px; background: rgba(212, 175, 55, 0.1); overflow: hidden;">
+                        <div style="width: 94%; height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb); border-radius: 10px; transition: width 0.8s ease;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="stat-label">订单完成率</span>
+                        <span style="font-weight: 700; font-family: 'Inter', sans-serif; color: var(--text-primary); font-size: 1.1rem;">98%</span>
+                    </div>
+                    <div style="height: 8px; border-radius: 10px; background: rgba(212, 175, 55, 0.1); overflow: hidden;">
+                        <div style="width: 98%; height: 100%; background: linear-gradient(90deg, #f97316, #ea580c); border-radius: 10px; transition: width 0.8s ease;"></div>
+                    </div>
+                </div>
+
+                <div style="padding-top: 30px; border-top: 1px solid var(--border-light);">
+                    <h6 style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem; margin-bottom: 22px; font-family: 'Playfair Display', serif;">系统状态</h6>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);"></span>
+                        <span style="font-size: 0.9rem; color: var(--text-secondary);">服务器运行正常</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);"></span>
+                        <span style="font-size: 0.9rem; color: var(--text-secondary);">数据库连接正常</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

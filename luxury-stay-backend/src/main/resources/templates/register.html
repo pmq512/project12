@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - LuxuryStay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f1a;
+            --primary-light: #1a1a2e;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --text-white: #ffffff;
+            --text-gray: #5a5a6e;
+            --text-light: #8888a0;
+            --bg-dark: #0f0f1a;
+            --bg-gradient-start: #0f0f1a;
+            --bg-gradient-mid: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.15);
+            --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.2);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.65;
+            color: #333333;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', 'Inter', serif;
+            font-weight: 600;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-box {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            padding: 60px;
+            max-width: 700px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            right: -50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1.05rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .form-title {
+            color: var(--text-white);
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: -0.01em;
+        }
+
+        .register-form .form-group {
+            margin-bottom: 24px;
+        }
+
+        .register-form .form-label {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+            font-size: 0.925rem;
+            margin-bottom: 12px;
+            display: block;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .register-form .form-label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        .register-form .form-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 18px 22px;
+            color: var(--text-white);
+            font-size: 0.975rem;
+            transition: var(--transition-normal);
+            font-family: inherit;
+        }
+
+        .register-form .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .register-form .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .register-form .form-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 18px 22px;
+            color: var(--text-white);
+            font-size: 0.975rem;
+            transition: var(--transition-normal);
+            font-family: inherit;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='rgba(255,255,255,0.5)' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 3.5rem;
+        }
+
+        .register-form .form-select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 18px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.4);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-slow);
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-color) 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(212, 175, 55, 0.5);
+            color: var(--text-white);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 40px;
+            padding: 16px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: var(--transition-fast);
+        }
+
+        .radio-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--secondary-color);
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            color: var(--secondary-color);
+        }
+
+        .radio-option input[type="radio"]:checked {
+            border-color: var(--secondary-color);
+        }
+
+        .radio-option label {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.975rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .business-fields {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            animation: slideDown 0.35s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .login-link p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.925rem;
+        }
+
+        .login-link a {
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            margin-left: 4px;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+            color: var(--secondary-dark);
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.925rem;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #86efac;
+        }
+
+        .security-badge {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .security-badge p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .security-badge i {
+            font-size: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .form-hint {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .register-box {
+                padding: 40px 28px;
+            }
+
+            .brand-name {
+                font-size: 2.25rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .radio-option {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-box">
+            <div class="brand-logo">
+                <div class="brand-name">LuxuryStay</div>
+                <div class="brand-subtitle">创建您的账户，开启奢华之旅</div>
+            </div>
+
+            <h2 class="form-title">账户注册</h2>
+
+            <form th:action="@{/auth/register}" method="post" th:object="${registerRequest}" class="register-form">
+                <div class="row g-5 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">姓名</label>
+                        <input type="text" th:field="*{name}" 
+                               class="form-control" placeholder="请输入您的姓名">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">邮箱地址</label>
+                        <input type="email" th:field="*{email}" 
+                               class="form-control" placeholder="请输入您的邮箱">
+                    </div>
+                </div>
+
+                <div class="row g-5 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">密码</label>
+                        <input type="password" th:field="*{password}" 
+                               class="form-control" placeholder="请输入密码（至少6位）">
+                        <span class="form-hint">密码长度至少6位，建议包含字母和数字</span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">联系电话</label>
+                        <input type="tel" th:field="*{phone}" 
+                               class="form-control" placeholder="请输入手机号码">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">用户类型</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" th:field="*{userType}" value="USER" checked>
+                            <label>普通用户</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" th:field="*{userType}" value="BUSINESS">
+                            <label>酒店商家</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="business-fields" class="business-fields" style="display: none;">
+                    <div class="row g-5">
+                        <div class="col-md-6">
+                            <label class="form-label">公司名称</label>
+                            <input type="text" th:field="*{companyName}" 
+                                   class="form-control" placeholder="请输入公司名称">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">营业执照号码</label>
+                            <input type="text" th:field="*{businessLicense}" 
+                                   class="form-control" placeholder="请输入营业执照号码">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary-custom">注册</button>
+            </form>
+
+            <div class="login-link">
+                <p>已有账户？
+                    <a href="/auth/login">立即登录</a>
+                </p>
+            </div>
+
+            <div th:if="${error}" class="alert-custom alert-danger">
+                <i class="fa-solid fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+            <div th:if="${success}" class="alert-custom alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+
+            <div class="security-badge">
+                <p>
+                    <i class="fa-solid fa-lock"></i>
+                    您的信息已加密，安全可靠
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('input[name="userType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const businessFields = document.getElementById('business-fields');
+                if (this.value === 'BUSINESS') {
+                    businessFields.style.display = 'block';
+                } else {
+                    businessFields.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>数据报表 - 管理员后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .font-serif {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+        }
+        .font-sans {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content" class="font-sans">
+            <div class="mb-6">
+                <h2 class="h4 text-gray-800 font-semibold mb-2">数据报表</h2>
+                <p class="text-gray-500 text-sm">系统数据统计概览</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">用户总数</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${totalUsers}">0</h3>
+                        </div>
+                        <div class="stat-icon blue">
+                            <i class="bi bi-users"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">商家用户</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${businessUsers}">0</h3>
+                        </div>
+                        <div class="stat-icon purple">
+                            <i class="bi bi-building"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">普通用户</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${regularUsers}">0</h3>
+                        </div>
+                        <div class="stat-icon green">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">酒店总数</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${totalHotels}">0</h3>
+                        </div>
+                        <div class="stat-icon cyan">
+                            <i class="bi bi-hotel"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">订单总数</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${totalBookings}">0</h3>
+                        </div>
+                        <div class="stat-icon orange">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-gray-500 text-sm mb-1">待处理纠纷</p>
+                            <h3 class="text-2xl font-bold text-gray-800" th:text="${pendingDisputes}">0</h3>
+                        </div>
+                        <div class="stat-icon red">
+                            <i class="bi bi-clipboard-alert"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h5><i class="bi bi-calendar-check me-2"></i>订单统计</h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">完成订单</span>
+                                <div class="d-flex items-center gap-3">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 rounded-full" 
+                                             th:style="'width: ' + (${totalBookings > 0 ? (${completedBookings} * 100 / ${totalBookings}) : 0}) + '%'">
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold text-gray-800" th:text="${completedBookings}">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">取消订单</span>
+                                <div class="d-flex items-center gap-3">
+                                    <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-red-500 rounded-full" 
+                                             th:style="'width: ' + (${totalBookings > 0 ? (${cancelledBookings} * 100 / ${totalBookings}) : 0}) + '%'">
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold text-gray-800" th:text="${cancelledBookings}">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">订单完成率</span>
+                                <span class="font-bold text-xl text-green-600" 
+                                      th:text="${totalBookings > 0 ? (${completedBookings} * 100 / ${totalBookings}) : 0} + '%'">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h5><i class="bi bi-star me-2"></i>评论统计</h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">评论总数</span>
+                                <span class="font-semibold text-gray-800" th:text="${totalReviews}">0</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">已审核评论</span>
+                                <span class="font-semibold text-gray-800" th:text="${approvedReviews}">0</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between items-center">
+                                <span class="text-gray-600">审核通过率</span>
+                                <span class="font-bold text-xl text-blue-600" 
+                                      th:text="${totalReviews > 0 ? (${approvedReviews} * 100 / ${totalReviews}) : 0} + '%'">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</body>
+</html>

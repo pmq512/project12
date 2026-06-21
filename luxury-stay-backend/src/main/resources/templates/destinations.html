@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>目的地 - LuxuryStay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d1117;
+            --primary-light: #161b22;
+            --secondary-color: #0ea5e9;
+            --secondary-light: #38bdf8;
+            --secondary-dark: #0284c7;
+            --accent-color: #8b5cf6;
+            --accent-light: #a78bfa;
+            --gold-color: #f59e0b;
+            --success-color: #22c55e;
+            --warning-color: #f97316;
+            --text-white: #ffffff;
+            --text-gray: #6b7280;
+            --text-light: #9ca3af;
+            --text-muted: #d1d5db;
+            --bg-dark: #0d1117;
+            --bg-light: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-dark: #1c2128;
+            --bg-gradient-blue: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-dark: #30363d;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.12);
+            --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 40px rgba(14, 165, 233, 0.3);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.65;
+            color: #1f2937;
+            background-color: var(--bg-light);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', 'Inter', serif;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--primary-color);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f2e 100%);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 3px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            font-size: 0.925rem;
+            padding: 0.65rem 1.1rem !important;
+            margin: 0 0.15rem;
+            border-radius: 10px;
+            transition: var(--transition-fast);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+            background: rgba(14, 165, 233, 0.15);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--secondary-color) !important;
+            background: rgba(14, 165, 233, 0.2);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light) 100%);
+            color: var(--text-white);
+            padding: 13px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.925rem;
+            letter-spacing: 0.5px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-light) 0%, var(--secondary-color) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5);
+            color: var(--text-white);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(13, 17, 23, 0.98) 0%, rgba(22, 27, 34, 0.95) 40%, rgba(139, 92, 246, 0.9) 100%), 
+                        url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20world%20map%20globe%20travel%20destinations%20colorful%20night%20sky%20stars&image_size=landscape_16_9');
+            background-size: cover;
+            background-position: center;
+            padding: 160px 0 120px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 60%);
+            border-radius: 50%;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+            border-radius: 50%;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: var(--text-white);
+            margin-bottom: 25px;
+            letter-spacing: -0.04em;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #ffffff 0%, var(--secondary-light) 50%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.45rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-box-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 12px;
+            box-shadow: var(--shadow-2xl);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-normal);
+        }
+
+        .search-box:hover {
+            border-color: rgba(14, 165, 233, 0.3);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 18px 24px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: transparent;
+            color: var(--text-white);
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box button {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light) 100%);
+            border: none;
+            color: var(--text-white);
+            padding: 18px 40px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .search-box button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5);
+        }
+
+        .search-tags {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-tag {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 0.925rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-weight: 500;
+        }
+
+        .search-tag:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(14, 165, 233, 0.4);
+            color: var(--text-white);
+            transform: translateY(-2px);
+        }
+
+        .stats-section {
+            background: var(--bg-card);
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border-light);
+            margin-top: -50px;
+            position: relative;
+            z-index: 2;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+            border-radius: 20px;
+            transition: var(--transition-normal);
+        }
+
+        .stat-item:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--text-white);
+            font-size: 1.4rem;
+        }
+
+        .stat-number {
+            font-size: 2.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .destinations-section {
+            padding: 100px 0;
+            background: var(--bg-light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: -0.02em;
+            margin-bottom: 18px;
+        }
+
+        .section-subtitle {
+            color: var(--text-gray);
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 16px 36px;
+            border-radius: 35px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border: 2px solid transparent;
+            background: var(--bg-card);
+            color: var(--text-gray);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: var(--text-white);
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 36px;
+        }
+
+        .city-card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .city-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+            border: 1px solid var(--border-light);
+            position: relative;
+        }
+
+        .city-card:hover {
+            transform: translateY(-18px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(14, 165, 233, 0.3);
+        }
+
+        .city-card-image {
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .city-card:hover .city-card-image img {
+            transform: scale(1.15);
+        }
+
+        .city-card-badges {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .city-card-badge {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-light) 100%);
+            color: var(--text-white);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+        }
+
+        .city-card-badge.gold {
+            background: linear-gradient(135deg, var(--gold-color) 0%, #d97706 100%);
+        }
+
+        .city-card-badge.purple {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-light) 100%);
+        }
+
+        .city-card-content {
+            padding: 30px;
+        }
+
+        .city-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .city-card-name {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            transition: var(--transition-fast);
+        }
+
+        .city-card:hover .city-card-name {
+            color: var(--secondary-color);
+        }
+
+        .city-card-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+            padding: 6px 14px;
+            border-radius: 14px;
+            color: var(--gold-color);
+            font-size: 0.925rem;
+            font-weight: 600;
+        }
+
+        .city-card-region {
+            color: var(--text-gray);
+            font-size: 1rem;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .city-card-region i {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .city-card-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .city-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .city-card-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .city-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-gray);
+            font-size: 0.925rem;
+        }
+
+        .city-stat-item i {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        .city-stat-item span {
+            font-weight: 500;
+        }
+
+        .city-card-arrow {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border-radius: 16px;
+            color: var(--secondary-color);
+            transition: var(--transition-normal);
+        }
+
+        .city-card:hover .city-card-arrow {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: var(--text-white);
+            transform: translateX(10px);
+        }
+
+        .pagination-section {
+            padding: 40px 0 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pagination-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pagination-item {
+            display: flex;
+        }
+
+        .pagination-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--bg-card);
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .pagination-link:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .pagination-item.active .pagination-link {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: var(--text-white);
+            border-color: transparent;
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+        }
+
+        .pagination-info {
+            display: flex;
+            gap: 24px;
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+
+        .pagination-info span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-info span span {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .seasonal-section {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary-light) 50%, #1e1b4b 100%);
+            padding: 120px 0;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seasonal-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .seasonal-header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .seasonal-title {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .seasonal-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .seasonal-cities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 40px;
+        }
+
+        .seasonal-card {
+            position: relative;
+            height: 320px;
+            border-radius: 32px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .seasonal-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .seasonal-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .seasonal-card:hover img {
+            transform: scale(1.12);
+        }
+
+        .seasonal-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.2) 40%, rgba(0, 0, 0, 0.9) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+
+        .seasonal-card-badge {
+            align-self: flex-start;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: var(--text-white);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+        }
+
+        .seasonal-card-name {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .seasonal-card-name i {
+            color: var(--secondary-light);
+            font-size: 1.5rem;
+        }
+
+        .seasonal-card-desc {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .seasonal-card-stats {
+            display: flex;
+            gap: 25px;
+        }
+
+        .seasonal-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.95rem;
+        }
+
+        .seasonal-card-stat i {
+            color: var(--secondary-light);
+        }
+
+        .explore-section {
+            padding: 100px 0;
+            background: var(--bg-card);
+        }
+
+        .explore-content {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto;
+            margin-bottom: 80px;
+        }
+
+        .explore-title {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .explore-desc {
+            color: var(--text-gray);
+            font-size: 1.15rem;
+        }
+
+        .explore-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 24px;
+        }
+
+        .explore-category {
+            background: var(--bg-light);
+            padding: 35px 25px;
+            border-radius: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            border: 2px solid transparent;
+        }
+
+        .explore-category:hover {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border-color: rgba(14, 165, 233, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .explore-category-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--text-white);
+            font-size: 1.75rem;
+            transition: var(--transition-normal);
+        }
+
+        .explore-category:hover .explore-category-icon {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        }
+
+        .explore-category-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .explore-category-count {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .tips-section {
+            padding: 100px 0;
+            background: var(--bg-light);
+            margin-top: 80px;
+        }
+
+        .tips-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .tips-title {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .tips-subtitle {
+            color: var(--text-gray);
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+        }
+
+        .tips-card {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: var(--transition-normal);
+        }
+
+        .tips-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(14, 165, 233, 0.2);
+        }
+
+        .tips-card-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-gradient-blue);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            color: var(--text-white);
+            font-size: 1.5rem;
+            transition: var(--transition-normal);
+        }
+
+        .tips-card:hover .tips-card-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        }
+
+        .tips-card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .tips-card-desc {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            line-height: 1.65;
+            margin-bottom: 20px;
+        }
+
+        .tips-card-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tips-tag {
+            background: rgba(14, 165, 233, 0.08);
+            color: var(--secondary-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .trending-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        }
+
+        .trending-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .trending-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .trending-subtitle {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+        }
+
+        .trending-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .trending-tag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .trending-tag:hover {
+            background: var(--bg-gradient-blue);
+            color: var(--text-white);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+
+        .trending-tag i {
+            font-size: 0.85rem;
+        }
+
+        .trending-count {
+            background: rgba(0, 0, 0, 0.08);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trending-tag:hover .trending-count {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .testimonials-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
+        }
+
+        .testimonials-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .testimonials-title {
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .testimonials-subtitle {
+            color: var(--text-gray);
+            font-size: 1.15rem;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 28px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+            transition: var(--transition-normal);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .testimonial-rating {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-rating i {
+            color: var(--gold-color);
+            font-size: 1rem;
+        }
+
+        .testimonial-text {
+            color: var(--text-gray);
+            font-size: 1rem;
+            line-height: 1.75;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-white);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .author-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+
+        .author-location {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary-light) 100%);
+            padding: 120px 0 60px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(14, 165, 233, 0.3), transparent);
+        }
+
+        .footer-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 3px;
+            margin-bottom: 35px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 35px;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 45px;
+            margin-top: 45px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.925rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.75rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.15rem;
+            }
+
+            .section-title {
+                font-size: 2.25rem;
+            }
+
+            .filter-tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 15px;
+            }
+
+            .filter-tab {
+                flex-shrink: 0;
+            }
+
+            .cities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .seasonal-cities {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">LuxuryStay</a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/destinations">目的地</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/hotels">酒店</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/auth/login">登录</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary-custom" href="/auth/register">注册</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/profile">
+                            <i class="fa-solid fa-user"></i>
+                            <span sec:authentication="name"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('BUSINESS')">
+                        <a class="btn btn-primary-custom" href="/business">商家后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="btn btn-primary-custom" href="/admin">管理后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="btn btn-primary-custom" href="/user">用户中心</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form action="/auth/logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light">退出登录</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">探索世界</h1>
+            <p class="hero-subtitle">发现令人惊叹的目的地，开启您的奢华之旅，探索每一个角落的独特魅力</p>
+            
+            <div class="search-box-container">
+                <div class="search-box">
+                    <i class="fa-solid fa-search text-muted" style="padding-left: 20px;"></i>
+                    <input type="text" id="citySearch" placeholder="搜索城市、景点、地标或体验..." />
+                    <button onclick="searchCity()">
+                        <i class="fa-solid fa-compass"></i>
+                        探索
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-tags">
+                <span class="search-tag" onclick="searchByTag('北京')">🏯 北京</span>
+                <span class="search-tag" onclick="searchByTag('上海')">🌃 上海</span>
+                <span class="search-tag" onclick="searchByTag('杭州')">🌊 杭州</span>
+                <span class="search-tag" onclick="searchByTag('成都')">🍜 成都</span>
+                <span class="search-tag" onclick="searchByTag('三亚')">🏖️ 三亚</span>
+                <span class="search-tag" onclick="searchByTag('西安')">🕌 西安</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-map-pin"></i></div>
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">热门城市</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+                    <div class="stat-number">2000+</div>
+                    <div class="stat-label">精选酒店</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-number">100万+</div>
+                    <div class="stat-label">满意用户</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">好评率</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="destinations-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">热门目的地</h2>
+                <p class="section-subtitle">精选热门旅游城市，每一座都有独特的魅力等待您去发现与探索</p>
+            </div>
+
+            <div class="filter-tabs">
+                <span class="filter-tab active" onclick="filterCities('all')">全部城市</span>
+                <span class="filter-tab" onclick="filterCities('north')">华北地区</span>
+                <span class="filter-tab" onclick="filterCities('south')">华南地区</span>
+                <span class="filter-tab" onclick="filterCities('east')">华东地区</span>
+                <span class="filter-tab" onclick="filterCities('central')">华中地区</span>
+                <span class="filter-tab" onclick="filterCities('west')">西部地区</span>
+                <span class="filter-tab" onclick="filterCities('hkmt')">港澳台地区</span>
+                <span class="filter-tab" onclick="filterCities('hot')">热门推荐</span>
+            </div>
+
+            <div class="cities-grid" id="citiesContainer">
+                <a th:each="city : ${cities}" 
+                   th:href="@{/search(location=${city.name})}"
+                   class="city-card-link">
+                    <div class="city-card" 
+                         th:data-region="${city.region}" th:data-hot="${city.isHot}">
+                        <div class="city-card-image">
+                            <img th:src="@{https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image(prompt=${city.name} + '%20city%20landmark%20beautiful%20scenery%20professional%20photography%20tourism')}" 
+                                 th:alt="${city.name}">
+                            <div class="city-card-badges">
+                                <span th:if="${city.isHot}" class="city-card-badge">🔥 热门</span>
+                                <span th:if="${city.hotelCount > 100}" class="city-card-badge gold">⭐ 热门之选</span>
+                                <span th:if="${city.rating >= 4.8}" class="city-card-badge purple">🏆 高评分</span>
+                            </div>
+                        </div>
+                        <div class="city-card-content">
+                            <div class="city-card-header">
+                                <h3 class="city-card-name" th:text="${city.name}"></h3>
+                                <div class="city-card-rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span>4.8</span>
+                                </div>
+                            </div>
+                            <p class="city-card-region">
+                                <i class="fa-solid fa-map-marker"></i>
+                                <span th:text="${city.province}"></span>
+                            </p>
+                            <p class="city-card-desc" th:text="${city.description}"></p>
+                            <div class="city-card-footer">
+                                <div class="city-card-stats">
+                                    <div class="city-stat-item">
+                                        <i class="fa-solid fa-building"></i>
+                                        <span th:text="${city.hotelCount} + ' 酒店'"></span>
+                                    </div>
+                                    <div class="city-stat-item">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        <span>全年适宜</span>
+                                    </div>
+                                </div>
+                                <div class="city-card-arrow">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="pagination-section" th:if="${totalPages > 1}">
+            <nav class="pagination">
+                <ul class="pagination-list">
+                    <li class="pagination-item" th:if="${hasPrevious}">
+                        <a th:href="@{/destinations(page=${currentPage - 1})}" class="pagination-link">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                        class="pagination-item" 
+                        th:classappend="${pageNum == currentPage ? 'active' : ''}">
+                        <a th:href="@{/destinations(page=${pageNum})}" class="pagination-link">
+                            <span th:text="${pageNum + 1}"></span>
+                        </a>
+                    </li>
+                    <li class="pagination-item" th:if="${hasNext}">
+                        <a th:href="@{/destinations(page=${currentPage + 1})}" class="pagination-link">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+                <div class="pagination-info">
+                    <span>共 <span th:text="${totalElements}"></span> 个城市</span>
+                    <span>第 <span th:text="${currentPage + 1}"></span> / <span th:text="${totalPages}"></span> 页</span>
+                </div>
+            </nav>
+        </div>
+    </section>
+
+    <section class="seasonal-section">
+        <div class="container">
+            <div class="seasonal-header">
+                <h2 class="seasonal-title">季节推荐目的地</h2>
+                <p class="seasonal-subtitle">根据不同季节，为您推荐最适合前往的旅行目的地</p>
+            </div>
+            
+            <div class="seasonal-cities">
+                <div class="seasonal-card" onclick="window.location.href='/search?location=三亚'">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sanya%20beach%20tropical%20paradise%20sunset%20palm%20trees%20crystal%20clear%20water%20professional&image_size=landscape_4_3" alt="三亚">
+                    <div class="seasonal-card-overlay">
+                        <span class="seasonal-card-badge">☀️ 冬季推荐</span>
+                        <h3 class="seasonal-card-name">
+                            <i class="fa-solid fa-sun"></i>
+                            三亚
+                        </h3>
+                        <p class="seasonal-card-desc">温暖的阳光沙滩，逃离寒冬的最佳选择</p>
+                        <div class="seasonal-card-stats">
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-thermometer-sun"></i> 25-30°C</span>
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-building"></i> 200+ 酒店</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="seasonal-card" onclick="window.location.href='/search?location=杭州'">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hangzhou%20west%20lake%20spring%20cherry%20blossom%20traditional%20garden%20beautiful%20reflection&image_size=landscape_4_3" alt="杭州">
+                    <div class="seasonal-card-overlay">
+                        <span class="seasonal-card-badge">🌸 春季推荐</span>
+                        <h3 class="seasonal-card-name">
+                            <i class="fa-solid fa-flower2"></i>
+                            杭州
+                        </h3>
+                        <p class="seasonal-card-desc">西湖春色，桃红柳绿，诗情画意的江南美景</p>
+                        <div class="seasonal-card-stats">
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-thermometer-sun"></i> 15-25°C</span>
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-building"></i> 150+ 酒店</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="seasonal-card" onclick="window.location.href='/search?location=青岛'">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=qingdao%20coastal%20city%20summer%20beach%20blue%20sky%20ocean%20fresh%20seafood%20professional&image_size=landscape_4_3" alt="青岛">
+                    <div class="seasonal-card-overlay">
+                        <span class="seasonal-card-badge">🌊 夏季推荐</span>
+                        <h3 class="seasonal-card-name">
+                            <i class="fa-solid fa-waves"></i>
+                            青岛
+                        </h3>
+                        <p class="seasonal-card-desc">海滨之城，清凉夏日，啤酒与海鲜的完美结合</p>
+                        <div class="seasonal-card-stats">
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-thermometer-sun"></i> 20-28°C</span>
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-building"></i> 180+ 酒店</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="seasonal-card" onclick="window.location.href='/search?location=北京'">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beijing%20autumn%20golden%20leaves%20palace%20museum%20traditional%20architecture%20beautiful&image_size=landscape_4_3" alt="北京">
+                    <div class="seasonal-card-overlay">
+                        <span class="seasonal-card-badge">🍁 秋季推荐</span>
+                        <h3 class="seasonal-card-name">
+                            <i class="fa-solid fa-tree-deciduous"></i>
+                            北京
+                        </h3>
+                        <p class="seasonal-card-desc">金秋十月，红叶满山，古都韵味更加浓厚</p>
+                        <div class="seasonal-card-stats">
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-thermometer-sun"></i> 10-22°C</span>
+                            <span class="seasonal-card-stat"><i class="fa-solid fa-building"></i> 200+ 酒店</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="explore-section">
+        <div class="container">
+            <div class="explore-content">
+                <h2 class="explore-title">探索更多</h2>
+                <p class="explore-desc">根据您的兴趣爱好，发现更多精彩目的地和独特体验</p>
+            </div>
+            
+            <div class="explore-categories">
+                <div class="explore-category" onclick="filterCities('hot')">
+                    <div class="explore-category-icon"><i class="fa-solid fa-flame"></i></div>
+                    <div class="explore-category-name">热门景点</div>
+                    <div class="explore-category-count">50+ 景点</div>
+                </div>
+                <div class="explore-category">
+                    <div class="explore-category-icon"><i class="fa-solid fa-utensils"></i></div>
+                    <div class="explore-category-name">美食之旅</div>
+                    <div class="explore-category-count">30+ 城市</div>
+                </div>
+                <div class="explore-category">
+                    <div class="explore-category-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                    <div class="explore-category-name">海滨度假</div>
+                    <div class="explore-category-count">20+ 目的地</div>
+                </div>
+                <div class="explore-category">
+                    <div class="explore-category-icon"><i class="fa-solid fa-mountain"></i></div>
+                    <div class="explore-category-name">自然风光</div>
+                    <div class="explore-category-count">40+ 景点</div>
+                </div>
+                <div class="explore-category">
+                    <div class="explore-category-icon"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="explore-category-name">文化古迹</div>
+                    <div class="explore-category-count">35+ 古迹</div>
+                </div>
+                <div class="explore-category">
+                    <div class="explore-category-icon"><i class="fa-solid fa-shopping-bag"></i></div>
+                    <div class="explore-category-name">购物天堂</div>
+                    <div class="explore-category-count">15+ 城市</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tips-section">
+        <div class="container">
+            <div class="tips-header">
+                <h2 class="tips-title">旅行贴士</h2>
+                <p class="tips-subtitle">出行前必备的实用信息，让您的旅程更加顺利</p>
+            </div>
+            
+            <div class="tips-grid">
+                <div class="tips-card">
+                    <div class="tips-card-icon">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                    <h3 class="tips-card-title">机票预订</h3>
+                    <p class="tips-card-desc">提前2-3个月预订机票可享受更优惠的价格，关注航空公司促销活动。</p>
+                    <div class="tips-card-tags">
+                        <span class="tips-tag">提前预订</span>
+                        <span class="tips-tag">比价</span>
+                    </div>
+                </div>
+                
+                <div class="tips-card">
+                    <div class="tips-card-icon">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <h3 class="tips-card-title">签证办理</h3>
+                    <p class="tips-card-desc">部分国家需提前办理签证，请预留足够时间准备材料，确保证件有效期。</p>
+                    <div class="tips-card-tags">
+                        <span class="tips-tag">提前申请</span>
+                        <span class="tips-tag">材料准备</span>
+                    </div>
+                </div>
+                
+                <div class="tips-card">
+                    <div class="tips-card-icon">
+                        <i class="fa-solid fa-suitcase"></i>
+                    </div>
+                    <h3 class="tips-card-title">行李准备</h3>
+                    <p class="tips-card-desc">根据目的地气候和行程安排准备行李，注意航空公司行李额度限制。</p>
+                    <div class="tips-card-tags">
+                        <span class="tips-tag">精简出行</span>
+                        <span class="tips-tag">必备物品</span>
+                    </div>
+                </div>
+                
+                <div class="tips-card">
+                    <div class="tips-card-icon">
+                        <i class="fa-solid fa-shield"></i>
+                    </div>
+                    <h3 class="tips-card-title">旅行保险</h3>
+                    <p class="tips-card-desc">购买旅行保险保障您的旅途安全，涵盖医疗、行程取消等风险。</p>
+                    <div class="tips-card-tags">
+                        <span class="tips-tag">安全保障</span>
+                        <span class="tips-tag">全面覆盖</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trending-section">
+        <div class="container">
+            <div class="trending-header">
+                <h2 class="trending-title">热门搜索</h2>
+                <p class="trending-subtitle">看看大家都在搜索什么目的地</p>
+            </div>
+            
+            <div class="trending-tags">
+                <a href="/search?location=云南" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>云南</span>
+                    <span class="trending-count">2.3k</span>
+                </a>
+                <a href="/search?location=丽江" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>丽江</span>
+                    <span class="trending-count">1.8k</span>
+                </a>
+                <a href="/search?location=厦门" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>厦门</span>
+                    <span class="trending-count">1.5k</span>
+                </a>
+                <a href="/search?location=成都" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>成都</span>
+                    <span class="trending-count">1.4k</span>
+                </a>
+                <a href="/search?location=重庆" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>重庆</span>
+                    <span class="trending-count">1.2k</span>
+                </a>
+                <a href="/search?location=西安" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>西安</span>
+                    <span class="trending-count">1.1k</span>
+                </a>
+                <a href="/search?location=青岛" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>青岛</span>
+                    <span class="trending-count">980</span>
+                </a>
+                <a href="/search?location=苏州" class="trending-tag">
+                    <i class="fa-solid fa-search"></i>
+                    <span>苏州</span>
+                    <span class="trending-count">850</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="testimonials-header">
+                <h2 class="testimonials-title">用户评价</h2>
+                <p class="testimonials-subtitle">听听我们的用户怎么说</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"通过LuxuryStay预订的三亚之旅非常完美，酒店推荐精准，服务周到。下次旅行还会选择这里！"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">李</div>
+                        <div class="author-info">
+                            <span class="author-name">李明</span>
+                            <span class="author-location">北京</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"目的地页面的季节推荐功能太棒了，帮我找到了最适合的旅行时间，杭州的春天真的很美！"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">王</div>
+                        <div class="author-info">
+                            <span class="author-name">王芳</span>
+                            <span class="author-location">上海</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"城市卡片设计精美，信息清晰，让我能快速了解每个目的地的特色，非常方便！"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">张</div>
+                        <div class="author-info">
+                            <span class="author-name">张伟</span>
+                            <span class="author-location">广州</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">LuxuryStay</div>
+            <div class="footer-links">
+                <a href="/" class="footer-link">首页</a>
+                <a href="/destinations" class="footer-link">目的地</a>
+                <a href="/hotels" class="footer-link">酒店</a>
+                <a href="/about" class="footer-link">关于我们</a>
+                <a href="/contact" class="footer-link">联系我们</a>
+                <a href="/help" class="footer-link">帮助中心</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 LuxuryStay. All rights reserved. | 京ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function searchCity() {
+            const searchTerm = document.getElementById('citySearch').value.trim();
+            if (searchTerm) {
+                window.location.href = '/search?location=' + encodeURIComponent(searchTerm);
+            }
+        }
+
+        function searchByTag(tag) {
+            window.location.href = '/search?location=' + encodeURIComponent(tag);
+        }
+
+        function filterCities(region) {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const activeTab = document.querySelector(`.filter-tab[onclick*="filterCities('${region}')"]`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+            
+            const cards = document.querySelectorAll('.city-card-link');
+            cards.forEach(card => {
+                const cityCard = card.querySelector('.city-card');
+                if (region === 'all') {
+                    card.style.display = 'block';
+                } else if (region === 'hot') {
+                    card.style.display = cityCard.dataset.hot === 'true' ? 'block' : 'none';
+                } else {
+                    let regionMap = {
+                        'north': '华北',
+                        'south': '华南',
+                        'east': '华东',
+                        'central': '华中',
+                        'west': '西部',
+                        'hkmt': '港澳台'
+                    };
+                    card.style.display = cityCard.dataset.region === regionMap[region] ? 'block' : 'none';
+                }
+            });
+        }
+
+        document.getElementById('citySearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCity();
+            }
+        });
+    </script>
+</body>
+</html>

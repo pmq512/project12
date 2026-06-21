@@ -1,0 +1,93 @@
+<div th:fragment="content" class="font-sans">
+    <div class="row g-4 mb-6">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">待处理纠纷</p>
+                        <h3 class="stat-value" th:text="${pendingCount}">0</h3>
+                    </div>
+                    <div class="stat-icon orange"><i class="bi bi-clock"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">已解决</p>
+                        <h3 class="stat-value" th:text="${resolvedCount}">0</h3>
+                    </div>
+                    <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">已拒绝</p>
+                        <h3 class="stat-value" th:text="${rejectedCount}">0</h3>
+                    </div>
+                    <div class="stat-icon red"><i class="bi bi-x-circle"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-shield-alert me-2"></i>纠纷列表</h5>
+            <div class="text-white/70 text-sm">共 <span th:text="${disputes.size()}">0</span> 条纠纷</div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>纠纷ID</th>
+                        <th>订单号</th>
+                        <th>申请人</th>
+                        <th>申请原因</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="dispute : ${disputes}">
+                        <td>#<span th:text="${dispute.id}"></span></td>
+                        <td>#<span th:text="${dispute.bookingId}"></span></td>
+                        <td>
+                            <span class="status-badge" th:class="${dispute.applicantType == 'USER' ? 'status-resolved' : 'status-processing'}">
+                                <span th:text="${dispute.applicantType == 'USER' ? '用户' : '商家'}"></span>
+                            </span>
+                        </td>
+                        <td>
+                            <p class="text-sm text-gray-600 line-clamp-2" th:text="${dispute.reason}"></p>
+                        </td>
+                        <td>
+                            <span class="status-badge" th:classappend="${'status-' + dispute.status.toLowerCase()}" 
+                                  th:text="${dispute.status == 'PENDING' ? '待处理' : (dispute.status == 'RESOLVED' ? '已解决' : '已拒绝')}"></span>
+                        </td>
+                        <td th:text="${dispute.createdAt}"></td>
+                        <td>
+                            <a th:href="@{/business/disputes/{id}(id=${dispute.id})}" class="btn-action btn-info">
+                                <i class="bi bi-eye"></i>查看详情
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${disputes.isEmpty()}">
+                        <td colspan="7" class="text-center py-12">
+                            <div class="inline-flex flex-col items-center">
+                                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                    <i class="bi bi-shield-check text-gray-400 text-3xl"></i>
+                                </div>
+                                <p class="text-gray-500 mb-4">暂无纠纷数据</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

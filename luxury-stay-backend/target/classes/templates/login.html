@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - LuxuryStay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f1a;
+            --primary-light: #1a1a2e;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --text-white: #ffffff;
+            --text-gray: #5a5a6e;
+            --text-light: #8888a0;
+            --bg-dark: #0f0f1a;
+            --bg-gradient-start: #0f0f1a;
+            --bg-gradient-mid: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.15);
+            --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.2);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.65;
+            color: #333333;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', 'Inter', serif;
+            font-weight: 600;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            padding: 60px;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            right: -50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1.05rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .form-title {
+            color: var(--text-white);
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: -0.01em;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 28px;
+        }
+
+        .login-form .form-label {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+            font-size: 0.925rem;
+            margin-bottom: 12px;
+            display: block;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .login-form .form-label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        .login-form .form-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 18px 22px;
+            color: var(--text-white);
+            font-size: 0.975rem;
+            transition: var(--transition-normal);
+            font-family: inherit;
+        }
+
+        .login-form .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .login-form .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 18px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 24px rgba(212, 175, 55, 0.4);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: var(--transition-slow);
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-color) 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(212, 175, 55, 0.5);
+            color: var(--text-white);
+        }
+
+        .form-divider {
+            position: relative;
+            margin: 35px 0;
+            text-align: center;
+        }
+
+        .form-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateY(-50%);
+        }
+
+        .form-divider-text {
+            position: relative;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+            padding: 0 24px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.925rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--secondary-color);
+            color: var(--text-white);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.2);
+        }
+
+        .social-btn i {
+            font-size: 1.35rem;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .forgot-password a {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .register-link p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.925rem;
+        }
+
+        .register-link a {
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-fast);
+            margin-left: 4px;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+            color: var(--secondary-dark);
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.925rem;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #86efac;
+        }
+
+        .security-badge {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .security-badge p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .security-badge i {
+            font-size: 1rem;
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 576px) {
+            .login-box {
+                padding: 40px 28px;
+            }
+
+            .brand-name {
+                font-size: 2.25rem;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .social-login {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="brand-logo">
+                <div class="brand-name">LuxuryStay</div>
+                <div class="brand-subtitle">欢迎回来，请登录您的账户</div>
+            </div>
+
+            <h2 class="form-title">账户登录</h2>
+
+            <form th:action="@{/auth/login}" method="post" th:object="${loginRequest}" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">邮箱地址</label>
+                    <input type="email" th:field="*{email}" 
+                           class="form-control" placeholder="请输入您的邮箱">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" th:field="*{password}" 
+                           class="form-control" placeholder="请输入您的密码">
+                </div>
+                <button type="submit" class="btn btn-primary-custom">登录</button>
+            </form>
+
+            <div class="forgot-password">
+                <a href="#">忘记密码？</a>
+            </div>
+
+            <div class="form-divider">
+                <span class="form-divider-text">或使用以下方式登录</span>
+            </div>
+
+            <div class="social-login">
+                <button type="button" class="social-btn">
+                    <i class="fa-brands fa-weixin"></i>
+                    <span>微信</span>
+                </button>
+                <button type="button" class="social-btn">
+                    <i class="fa-brands fa-weibo"></i>
+                    <span>微博</span>
+                </button>
+            </div>
+
+            <div class="register-link">
+                <p>还没有账户？
+                    <a href="/auth/register">立即注册</a>
+                </p>
+            </div>
+
+            <div th:if="${error}" class="alert-custom alert-danger">
+                <i class="fa-solid fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+            <div th:if="${success}" class="alert-custom alert-success">
+                <i class="fa-solid fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+
+            <div class="security-badge">
+                <p>
+                    <i class="fa-solid fa-lock"></i>
+                    您的信息已加密，安全可靠
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>纠纷详情 - 管理员后台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .font-serif {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+        }
+        .font-sans {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content" class="font-sans">
+            <div class="mb-6">
+                <h2 class="h4 text-gray-800 font-semibold mb-2">纠纷详情</h2>
+                <p class="text-gray-500 text-sm">纠纷编号: #D-<span th:text="${dispute.id}">0</span></p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h5><i class="bi bi-info-circle me-2"></i>纠纷信息</h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">申请人类型</label>
+                            <span th:if="${dispute.applicantType == 'USER'}" class="status-badge status-pending">用户</span>
+                            <span th:if="${dispute.applicantType == 'BUSINESS'}" class="status-badge status-processing">商家</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">申请人ID</label>
+                            <p class="text-gray-800" th:text="${dispute.applicantId}">---</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">关联订单</label>
+                            <p class="text-gray-800">#O-<span th:text="${dispute.bookingId}">0</span></p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">纠纷状态</label>
+                            <span th:if="${dispute.status == 'PENDING'}" class="status-badge status-pending">待处理</span>
+                            <span th:if="${dispute.status == 'PROCESSING'}" class="status-badge status-processing">处理中</span>
+                            <span th:if="${dispute.status == 'RESOLVED'}" class="status-badge status-resolved">已解决</span>
+                            <span th:if="${dispute.status == 'REJECTED'}" class="status-badge status-rejected">已驳回</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">申请时间</label>
+                            <p class="text-gray-800" th:text="${dispute.createdAt}">---</p>
+                        </div>
+                        
+                        <div th:if="${dispute.resolvedAt != null}" class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">处理时间</label>
+                            <p class="text-gray-800" th:text="${dispute.resolvedAt}">---</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-table">
+                    <div class="data-table-header">
+                        <h5><i class="bi bi-file-text me-2"></i>纠纷原因</h5>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">原因描述</label>
+                            <p class="text-gray-800" th:text="${dispute.reason}">---</p>
+                        </div>
+                        
+                        <div th:if="${dispute.evidence != null}" class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">证据材料</label>
+                            <p class="text-gray-800" th:text="${dispute.evidence}">---</p>
+                        </div>
+                        
+                        <div th:if="${dispute.adminNote != null}" class="mb-4">
+                            <label class="text-sm text-gray-500 mb-1 d-block">处理备注</label>
+                            <p class="text-gray-800" th:text="${dispute.adminNote}">---</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="data-table mt-6">
+                <div class="data-table-header">
+                    <h5><i class="bi bi-calendar-check me-2"></i>关联订单信息</h5>
+                </div>
+                <div class="p-4">
+                    <div th:if="${booking != null}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-sm text-gray-500 mb-1 d-block">订单编号</label>
+                            <p class="text-gray-800">#O-<span th:text="${booking.id}">0</span></p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-500 mb-1 d-block">用户ID</label>
+                            <p class="text-gray-800" th:text="${booking.userId}">---</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-500 mb-1 d-block">酒店ID</label>
+                            <p class="text-gray-800" th:text="${booking.hotelId}">---</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-500 mb-1 d-block">订单金额</label>
+                            <p class="text-gray-800">¥<span th:text="${booking.totalAmount}">0</span></p>
+                        </div>
+                    </div>
+                    <div th:if="${booking == null}" class="text-center text-gray-500 py-4">
+                        订单信息未找到
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <div class="d-flex gap-3">
+                    <a th:if="${dispute.status == 'PENDING'}" th:href="@{/admin/disputes/{id}/process(id=${dispute.id})}" class="btn btn-warning btn-action">
+                        <i class="bi bi-hourglass"></i>开始处理
+                    </a>
+                    
+                    <button th:if="${dispute.status == 'PENDING' || dispute.status == 'PROCESSING'}" class="btn btn-success btn-action" data-bs-toggle="modal" data-bs-target="#resolveModal">
+                        <i class="bi bi-check-circle"></i>解决纠纷
+                    </button>
+                    
+                    <button th:if="${dispute.status == 'PENDING' || dispute.status == 'PROCESSING'}" class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="bi bi-x-circle"></i>驳回申请
+                    </button>
+                    
+                    <a th:href="@{/admin/disputes}" class="btn btn-action" style="background: #f1f5f9; color: #1e293b;">
+                        <i class="bi bi-arrow-left"></i>返回列表
+                    </a>
+                </div>
+            </div>
+            
+            <div class="modal fade" id="resolveModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">解决纠纷</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/admin/disputes/{id}/resolve(id=${dispute.id})}" method="get">
+                                <div class="mb-3">
+                                    <label class="form-label">处理备注</label>
+                                    <textarea class="form-control" name="note" rows="3" placeholder="请输入处理备注..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">确认解决</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade" id="rejectModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">驳回申请</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/admin/disputes/{id}/reject(id=${dispute.id})}" method="get">
+                                <div class="mb-3">
+                                    <label class="form-label">驳回原因</label>
+                                    <textarea class="form-control" name="note" rows="3" placeholder="请输入驳回原因..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-danger">确认驳回</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</body>
+</html>

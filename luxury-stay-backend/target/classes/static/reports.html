@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Stay - 数据报表中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --gold-50: #fffbeb;
+            --gold-100: #fef3c7;
+            --gold-200: #fde68a;
+            --gold-300: #fcd34d;
+            --gold-400: #fbbf24;
+            --gold-500: #f59e0b;
+            --gold-600: #d97706;
+            --gold-700: #b45309;
+            --gold-800: #92400e;
+            --gold-900: #78350f;
+            
+            --primary-dark: #0f0f0f;
+            --primary-darker: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 215, 0, 0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            
+            --gold-gradient-start: #f59e0b;
+            --gold-gradient-mid: #fbbf24;
+            --gold-gradient-end: #fcd34d;
+            
+            --gold-shine-start: rgba(255, 215, 0, 0.3);
+            --gold-shine-end: rgba(255, 215, 0, 0);
+            
+            --sidebar-width: 280px;
+            --shadow-gold: 0 0 30px rgba(245, 158, 11, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1a1a 50%, var(--primary-darker) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -30%;
+            left: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse at center, rgba(251, 191, 36, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, rgba(15, 15, 15, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-color);
+            padding: 28px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            padding: 0 28px 36px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sidebar-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            position: relative;
+        }
+
+        .sidebar-logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+        }
+
+        .sidebar-logo h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-nav {
+            padding: 0 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            margin-bottom: 6px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.98rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item:hover {
+            color: var(--gold-gradient-end);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            color: var(--gold-gradient-end);
+            border-left: 3px solid var(--gold-gradient-start);
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+        }
+
+        .nav-item-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            font-size: 1.15rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-item.active .nav-item-icon {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(251, 191, 36, 0.2) 100%);
+            color: var(--gold-gradient-end);
+        }
+
+        .nav-item:hover .nav-item-icon {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .month-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .month-nav-btn {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--gold-gradient-end);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .month-nav-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--gold-gradient-start);
+            transform: scale(1.05);
+        }
+
+        .month-display {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .month-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            min-width: 80px;
+        }
+
+        .month-select option {
+            background: #1a1a1a;
+            color: var(--text-primary);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-mid) 50%, var(--gold-gradient-end) 100%);
+            border: none;
+            color: #1a1a1a;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-action:hover::before {
+            left: 100%;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--gold-gradient-end);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .content-area {
+            padding: 40px;
+            max-width: 1900px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold-gradient-start) 0%, var(--gold-gradient-mid) 50%, var(--gold-gradient-end) 100%);
+            border-radius: 20px 20px 0 0;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-gold);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .stat-label {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
+            color: var(--gold-gradient-end);
+            position: relative;
+        }
+
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+        }
+
+        .stat-value {
+            font-size: 2.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-sub-value {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: inline-flex;
+        }
+
+        .stat-change.positive { 
+            color: #10b981; 
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .stat-change.negative { 
+            color: #ef4444; 
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.4s ease;
+            overflow: visible;
+            position: relative;
+        }
+
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-gradient-start), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .chart-card:hover::after {
+            opacity: 0.5;
+        }
+
+        .chart-card:hover {
+            box-shadow: var(--shadow-gold);
+            border-color: rgba(245, 158, 11, 0.25);
+            transform: translateY(-4px);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-title i {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
+            color: var(--gold-gradient-end);
+            font-size: 1.1rem;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .legend-line {
+            width: 20px;
+            height: 5px;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--gold-gradient-start), var(--gold-gradient-end));
+        }
+
+        .legend-line.secondary {
+            background: linear-gradient(90deg, #6b7280, #9ca3af);
+        }
+
+        .bar-chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            gap: 6px;
+            padding: 0 10px;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+            height: 200px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .bar {
+            width: 26px;
+            border-radius: 8px 8px 3px 3px;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 8px;
+        }
+
+        .bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .bar:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.15);
+        }
+
+        .bar-current {
+            background: linear-gradient(180deg, var(--gold-gradient-start) 0%, var(--gold-gradient-mid) 50%, var(--gold-gradient-end) 100%);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .bar-previous {
+            background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gold-gradient-end);
+            background: rgba(15, 15, 15, 0.9);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .bar:hover .bar-value {
+            opacity: 1;
+        }
+
+        .month-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            height: 280px;
+        }
+
+        .pie-chart {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--gold-gradient-start) 0% 60%, var(--gold-gradient-mid) 60% 85%, #6b7280 85% 100%);
+            box-shadow: 0 8px 30px rgba(245, 158, 11, 0.2);
+        }
+
+        .pie-chart::before {
+            content: '';
+            position: absolute;
+            width: 125px;
+            height: 125px;
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+
+        .pie-center {
+            position: relative;
+            text-align: center;
+        }
+
+        .pie-center-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pie-center-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .pie-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pie-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+        }
+
+        .pie-color.gold { background: var(--gold-gradient-start); }
+        .pie-color.gold-mid { background: var(--gold-gradient-mid); }
+        .pie-color.gray { background: #6b7280; }
+
+        .pie-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .pie-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-left: auto;
+        }
+
+        .line-chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        .line-chart {
+            height: 100%;
+            position: relative;
+        }
+
+        .y-axis {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-right: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .y-label {
+            text-align: right;
+        }
+
+        .line-chart-content {
+            position: absolute;
+            left: 45px;
+            right: 15px;
+            top: 0;
+            bottom: 45px;
+        }
+
+        .line-path {
+            fill: none;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke: var(--gold-gradient-start);
+        }
+
+        .line-area {
+            opacity: 0.15;
+            fill: url(#lineGradient);
+        }
+
+        .line-points {
+            display: none;
+        }
+
+        .x-axis {
+            position: absolute;
+            left: 45px;
+            right: 15px;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .x-label {
+            text-align: center;
+        }
+
+        .progress-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-gradient-start) 0%, var(--gold-gradient-end) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+            position: relative;
+            background: linear-gradient(90deg, var(--gold-gradient-start) 0%, var(--gold-gradient-mid) 50%, var(--gold-gradient-end) 100%);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .radar-chart-container {
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-chart {
+            width: 220px;
+            height: 220px;
+            position: relative;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            transition: all 0.4s ease;
+        }
+
+        .table-container:hover {
+            box-shadow: var(--shadow-gold);
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+
+        .table-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .table-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            padding: 16px 28px;
+            text-align: left;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .data-table td {
+            padding: 16px 28px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .data-table tr:hover {
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rating-star {
+            color: var(--gold-gradient-end);
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 24px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .badge.success { 
+            background: rgba(16, 185, 129, 0.15); 
+            color: #10b981; 
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .badge.warning { 
+            background: rgba(251, 191, 36, 0.15); 
+            color: var(--gold-gradient-end); 
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+        .badge.danger { 
+            background: rgba(239, 68, 68, 0.15); 
+            color: #ef4444; 
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .badge.info { 
+            background: rgba(59, 130, 246, 0.15); 
+            color: #3b82f6; 
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .footer {
+            padding: 28px 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background: rgba(15, 15, 15, 0.8);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .report-section {
+            display: none;
+        }
+
+        .report-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .export-dropdown {
+            position: relative;
+        }
+
+        .export-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+            box-shadow: var(--shadow-card);
+        }
+
+        .export-menu.active {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .export-option:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold-gradient-end);
+        }
+
+        .export-option i {
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .header-left, .header-right {
+                justify-content: center;
+            }
+
+            .content-area {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">
+                        <i class="bi bi-bar-chart-2"></i>
+                    </div>
+                    <h2>Luxury Stay</h2>
+                </div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active" onclick="switchReport('dashboard')">
+                    <div class="nav-item-icon"><i class="bi bi-layout-dashboard"></i></div>
+                    <span>仪表盘</span>
+                </div>
+                <div class="nav-item" onclick="switchReport('user')">
+                    <div class="nav-item-icon"><i class="bi bi-people"></i></div>
+                    <span>用户报表</span>
+                </div>
+                <div class="nav-item" onclick="switchReport('business')">
+                    <div class="nav-item-icon"><i class="bi bi-building"></i></div>
+                    <span>商家报表</span>
+                </div>
+                <div class="nav-item" onclick="switchReport('hotel')">
+                    <div class="nav-item-icon"><i class="bi bi-hotel"></i></div>
+                    <span>酒店报表</span>
+                </div>
+                <div class="nav-item" onclick="switchReport('admin')">
+                    <div class="nav-item-icon"><i class="bi bi-shield-check"></i></div>
+                    <span>管理员报表</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <div>
+                        <h1 class="page-title" id="pageTitle">仪表盘</h1>
+                        <p class="page-subtitle" id="pageSubtitle">实时数据概览与关键指标分析</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="month-selector">
+                        <button class="month-nav-btn" id="prevMonth" onclick="changeMonth(-1)">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <span class="month-display" id="monthDisplay">2026年6月</span>
+                        <button class="month-nav-btn" id="nextMonth" onclick="changeMonth(1)">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                        <select class="month-select" id="monthSelect" onchange="selectMonth(this.value)">
+                            <option value="0">1月</option><option value="1">2月</option><option value="2">3月</option>
+                            <option value="3">4月</option><option value="4">5月</option><option value="5" selected>6月</option>
+                            <option value="6">7月</option><option value="7">8月</option><option value="8">9月</option>
+                            <option value="9">10月</option><option value="10">11月</option><option value="11">12月</option>
+                        </select>
+                    </div>
+                    <button class="btn-action" onclick="refreshData()">
+                        <i class="bi bi-arrow-clockwise"></i>刷新
+                    </button>
+                    <div class="export-dropdown">
+                        <button class="btn-action btn-secondary" onclick="toggleExportMenu()">
+                            <i class="bi bi-download"></i>导出
+                        </button>
+                        <div class="export-menu" id="exportMenu">
+                            <div class="export-option" onclick="exportToCSV()">
+                                <i class="bi bi-file-earmark-spreadsheet"></i>CSV
+                            </div>
+                            <div class="export-option" onclick="exportToExcel()">
+                                <i class="bi bi-file-earmark-excel"></i>Excel
+                            </div>
+                            <div class="export-option" onclick="exportToPDF()">
+                                <i class="bi bi-file-earmark-pdf"></i>PDF
+                            </div>
+                            <div class="export-option" onclick="exportToImage()">
+                                <i class="bi bi-image"></i>图片
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div id="dashboard" class="report-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">平台总用户</span>
+                                <div class="stat-icon"><i class="bi bi-users"></i></div>
+                            </div>
+                            <div class="stat-value" id="dbTotalUsers">12,847</div>
+                            <div class="stat-sub-value">本月新增 +1,280</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +11.1%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">活跃商家</span>
+                                <div class="stat-icon"><i class="bi bi-building"></i></div>
+                            </div>
+                            <div class="stat-value" id="dbActiveBusiness">356</div>
+                            <div class="stat-sub-value">覆盖28个城市</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +6.6%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">本月订单</span>
+                                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="dbMonthOrders">28,934</div>
+                            <div class="stat-sub-value">营收 ¥1.28亿</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +12.6%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">用户满意度</span>
+                                <div class="stat-icon"><i class="bi bi-star"></i></div>
+                            </div>
+                            <div class="stat-value" id="dbRating">4.6</div>
+                            <div class="stat-sub-value">8,456条评价</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +8.6%</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-bar-chart"></i>月度订单趋势</span>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="legend-line"></div><span>本月</span></div>
+                                    <div class="legend-item"><div class="legend-line secondary"></div><span>上月</span></div>
+                                </div>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="bar-chart" id="dbBarChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-pie-chart"></i>订单状态分布</span>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart" id="dbPieChart">
+                                    <div class="pie-center">
+                                        <div class="pie-center-value">28.9k</div>
+                                        <div class="pie-center-label">总订单</div>
+                                    </div>
+                                </div>
+                                <div class="pie-legend">
+                                    <div class="pie-legend-item"><div class="pie-color gold"></div><span class="pie-label">已完成</span><span class="pie-value">60%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gold-mid"></div><span class="pie-label">进行中</span><span class="pie-value">25%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gray"></div><span class="pie-label">已取消</span><span class="pie-value">15%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div>
+                                <h3 class="table-title">热门酒店排行</h3>
+                                <p class="table-subtitle">按订单量排序</p>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>酒店名称</th>
+                                    <th>城市</th>
+                                    <th>评分</th>
+                                    <th>订单量</th>
+                                    <th>入住率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dbHotelRanking">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="user" class="report-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">新增用户</span>
+                                <div class="stat-icon"><i class="bi bi-person-plus"></i></div>
+                            </div>
+                            <div class="stat-value" id="userNewUsers">2,847</div>
+                            <div class="stat-sub-value">本月新增</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +15.3%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">活跃用户</span>
+                                <div class="stat-icon"><i class="bi bi-heart-pulse"></i></div>
+                            </div>
+                            <div class="stat-value" id="userActiveUsers">8,562</div>
+                            <div class="stat-sub-value">月活跃率 66.6%</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +8.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">订单数量</span>
+                                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="userOrders">18,234</div>
+                            <div class="stat-sub-value">用户平均订单 1.42</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +12.8%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">消费金额</span>
+                                <div class="stat-icon"><i class="bi bi-wallet"></i></div>
+                            </div>
+                            <div class="stat-value" id="userRevenue">¥8,652万</div>
+                            <div class="stat-sub-value">客单价 ¥4,745</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +9.5%</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-bar-chart"></i>用户增长趋势</span>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="legend-line"></div><span>本月</span></div>
+                                    <div class="legend-item"><div class="legend-line secondary"></div><span>上月</span></div>
+                                </div>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="bar-chart" id="userBarChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-pie-chart"></i>用户地域分布</span>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart" style="background: conic-gradient(var(--gold-gradient-start) 0% 35%, var(--gold-gradient-mid) 35% 60%, #6b7280 60% 80%, #9ca3af 80% 100%);">
+                                    <div class="pie-center">
+                                        <div class="pie-center-value">12.8k</div>
+                                        <div class="pie-center-label">总用户</div>
+                                    </div>
+                                </div>
+                                <div class="pie-legend">
+                                    <div class="pie-legend-item"><div class="pie-color gold"></div><span class="pie-label">一线城市</span><span class="pie-value">35%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gold-mid"></div><span class="pie-label">新一线城市</span><span class="pie-value">25%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gray"></div><span class="pie-label">二线城市</span><span class="pie-value">20%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color" style="background: #9ca3af;"></div><span class="pie-label">其他</span><span class="pie-value">20%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-line-chart"></i>用户活跃时段</span>
+                            </div>
+                            <div class="line-chart-container">
+                                <div class="line-chart">
+                                    <div class="y-axis">
+                                        <div class="y-label">5000</div>
+                                        <div class="y-label">4000</div>
+                                        <div class="y-label">3000</div>
+                                        <div class="y-label">2000</div>
+                                        <div class="y-label">0</div>
+                                    </div>
+                                    <div class="line-chart-content">
+                                        <svg viewBox="0 0 400 200" width="100%" height="100%">
+                                            <defs>
+                                                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" stop-color="#f59e0b" />
+                                                    <stop offset="100%" stop-color="rgba(245, 158, 11, 0)" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path class="line-area" d="M0,200 L0,180 Q50,160 100,140 T200,80 T300,100 T400,160 L400,200 Z" fill="url(#lineGradient)" />
+                                            <path class="line-path" d="M0,180 Q50,160 100,140 T200,80 T300,100 T400,160" />
+                                        </svg>
+                                    </div>
+                                    <div class="x-axis">
+                                        <div class="x-label">0-4点</div><div class="x-label">4-8点</div><div class="x-label">8-12点</div>
+                                        <div class="x-label">12-16点</div><div class="x-label">16-20点</div><div class="x-label">20-24点</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-star"></i>用户满意度分析</span>
+                            </div>
+                            <div class="progress-chart-container">
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">服务体验</span><span class="progress-value">92%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">预订便捷</span><span class="progress-value">88%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 88%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">价格合理</span><span class="progress-value">85%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">退款服务</span><span class="progress-value">90%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div>
+                                <h3 class="table-title">顶级消费用户排行</h3>
+                                <p class="table-subtitle">按消费金额排序</p>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>用户ID</th>
+                                    <th>注册日期</th>
+                                    <th>订单数</th>
+                                    <th>消费金额</th>
+                                    <th>会员等级</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTopList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="business" class="report-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">入驻商家</span>
+                                <div class="stat-icon"><i class="bi bi-building-plus"></i></div>
+                            </div>
+                            <div class="stat-value" id="bizTotalBusiness">428</div>
+                            <div class="stat-sub-value">本月新增 +36</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +9.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">活跃商家</span>
+                                <div class="stat-icon"><i class="bi bi-building-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="bizActiveBusiness">356</div>
+                            <div class="stat-sub-value">活跃度 83.2%</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +5.8%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">商家订单</span>
+                                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="bizOrders">28,934</div>
+                            <div class="stat-sub-value">平均订单 81.3</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +12.6%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">商家营收</span>
+                                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                            </div>
+                            <div class="stat-value" id="bizRevenue">¥1.28亿</div>
+                            <div class="stat-sub-value">平台抽成 ¥1280万</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +14.2%</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-bar-chart"></i>商家入驻趋势</span>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="legend-line"></div><span>本月</span></div>
+                                    <div class="legend-item"><div class="legend-line secondary"></div><span>上月</span></div>
+                                </div>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="bar-chart" id="bizBarChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-pie-chart"></i>商家类型分布</span>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart" style="background: conic-gradient(var(--gold-gradient-start) 0% 45%, var(--gold-gradient-mid) 45% 75%, #6b7280 75% 90%, #9ca3af 90% 100%);">
+                                    <div class="pie-center">
+                                        <div class="pie-center-value">428</div>
+                                        <div class="pie-center-label">总商家</div>
+                                    </div>
+                                </div>
+                                <div class="pie-legend">
+                                    <div class="pie-legend-item"><div class="pie-color gold"></div><span class="pie-label">连锁酒店</span><span class="pie-value">45%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gold-mid"></div><span class="pie-label">精品酒店</span><span class="pie-value">30%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gray"></div><span class="pie-label">民宿客栈</span><span class="pie-value">15%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color" style="background: #9ca3af;"></div><span class="pie-label">其他</span><span class="pie-value">10%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-line-chart"></i>商家营收趋势</span>
+                            </div>
+                            <div class="line-chart-container">
+                                <div class="line-chart">
+                                    <div class="y-axis">
+                                        <div class="y-label">3000</div>
+                                        <div class="y-label">2400</div>
+                                        <div class="y-label">1800</div>
+                                        <div class="y-label">1200</div>
+                                        <div class="y-label">0</div>
+                                    </div>
+                                    <div class="line-chart-content">
+                                        <svg viewBox="0 0 400 200" width="100%" height="100%">
+                                            <defs>
+                                                <linearGradient id="bizGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" stop-color="#f59e0b" />
+                                                    <stop offset="100%" stop-color="rgba(245, 158, 11, 0)" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path class="line-area" d="M0,200 L0,150 Q50,140 100,120 T200,80 T300,70 T400,60 L400,200 Z" fill="url(#bizGradient)" />
+                                            <path class="line-path" d="M0,150 Q50,140 100,120 T200,80 T300,70 T400,60" />
+                                        </svg>
+                                    </div>
+                                    <div class="x-axis">
+                                        <div class="x-label">1月</div><div class="x-label">2月</div><div class="x-label">3月</div>
+                                        <div class="x-label">4月</div><div class="x-label">5月</div><div class="x-label">6月</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-gauge"></i>商家经营指标</span>
+                            </div>
+                            <div class="progress-chart-container">
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">订单完成率</span><span class="progress-value">92%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">响应率</span><span class="progress-value">85%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">评分达标</span><span class="progress-value">88%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 88%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">违规率</span><span class="progress-value">3%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 3%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div>
+                                <h3 class="table-title">商家业绩排行</h3>
+                                <p class="table-subtitle">按订单量排序</p>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>商家名称</th>
+                                    <th>覆盖城市</th>
+                                    <th>星级</th>
+                                    <th>订单量</th>
+                                    <th>营收</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bizTopList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="hotel" class="report-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">酒店总数</span>
+                                <div class="stat-icon"><i class="bi bi-hotel"></i></div>
+                            </div>
+                            <div class="stat-value" id="hotelTotal">856</div>
+                            <div class="stat-sub-value">本月新增 +42</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +5.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">5星酒店</span>
+                                <div class="stat-icon"><i class="bi bi-star-fill"></i></div>
+                            </div>
+                            <div class="stat-value" id="hotelFiveStar">234</div>
+                            <div class="stat-sub-value">占比 27.3%</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +6.8%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">酒店订单</span>
+                                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                            </div>
+                            <div class="stat-value" id="hotelOrders">28,934</div>
+                            <div class="stat-sub-value">平均订单 33.8</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +12.6%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">平均房价</span>
+                                <div class="stat-icon"><i class="bi bi-currency-yen"></i></div>
+                            </div>
+                            <div class="stat-value" id="hotelAvgPrice">¥4,456</div>
+                            <div class="stat-sub-value">同比 +8.2%</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +8.2%</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-bar-chart"></i>酒店数量增长</span>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="legend-line"></div><span>本月</span></div>
+                                    <div class="legend-item"><div class="legend-line secondary"></div><span>上月</span></div>
+                                </div>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="bar-chart" id="hotelBarChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-pie-chart"></i>酒店星级分布</span>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart" style="background: conic-gradient(var(--gold-gradient-start) 0% 27%, var(--gold-gradient-mid) 27% 55%, #6b7280 55% 80%, #9ca3af 80% 100%);">
+                                    <div class="pie-center">
+                                        <div class="pie-center-value">856</div>
+                                        <div class="pie-center-label">总酒店</div>
+                                    </div>
+                                </div>
+                                <div class="pie-legend">
+                                    <div class="pie-legend-item"><div class="pie-color gold"></div><span class="pie-label">5星级</span><span class="pie-value">27%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gold-mid"></div><span class="pie-label">4星级</span><span class="pie-value">28%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gray"></div><span class="pie-label">3星级</span><span class="pie-value">25%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color" style="background: #9ca3af;"></div><span class="pie-label">其他</span><span class="pie-value">20%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-line-chart"></i>酒店价格区间分布</span>
+                            </div>
+                            <div class="line-chart-container">
+                                <div class="line-chart">
+                                    <div class="y-axis">
+                                        <div class="y-label">200</div>
+                                        <div class="y-label">150</div>
+                                        <div class="y-label">100</div>
+                                        <div class="y-label">50</div>
+                                        <div class="y-label">0</div>
+                                    </div>
+                                    <div class="line-chart-content">
+                                        <svg viewBox="0 0 400 200" width="100%" height="100%">
+                                            <defs>
+                                                <linearGradient id="hotelGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" stop-color="#f59e0b" />
+                                                    <stop offset="100%" stop-color="rgba(245, 158, 11, 0)" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path class="line-area" d="M0,200 L0,160 L50,140 L100,120 L150,90 L200,60 L250,80 L300,110 L350,140 L400,170 L400,200 Z" fill="url(#hotelGradient)" />
+                                            <path class="line-path" d="M0,160 L50,140 L100,120 L150,90 L200,60 L250,80 L300,110 L350,140 L400,170" />
+                                        </svg>
+                                    </div>
+                                    <div class="x-axis">
+                                        <div class="x-label">¥100以下</div><div class="x-label">¥100-300</div><div class="x-label">¥300-500</div>
+                                        <div class="x-label">¥500-800</div><div class="x-label">¥800-1000</div><div class="x-label">¥1000以上</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-star"></i>酒店设施评分</span>
+                            </div>
+                            <div class="progress-chart-container">
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">服务质量</span><span class="progress-value">94%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 94%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">卫生状况</span><span class="progress-value">92%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">设施维护</span><span class="progress-value">88%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 88%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">位置便利</span><span class="progress-value">85%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div>
+                                <h3 class="table-title">热门酒店排行</h3>
+                                <p class="table-subtitle">按订单量排序</p>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>酒店名称</th>
+                                    <th>城市</th>
+                                    <th>星级</th>
+                                    <th>评分</th>
+                                    <th>订单量</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hotelTopList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="admin" class="report-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">平台总收入</span>
+                                <div class="stat-icon"><i class="bi bi-wallet"></i></div>
+                            </div>
+                            <div class="stat-value" id="adminRevenue">¥1.39亿</div>
+                            <div class="stat-sub-value">本月数据</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +14.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">平台抽成收入</span>
+                                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                            </div>
+                            <div class="stat-value" id="adminCommission">¥1390万</div>
+                            <div class="stat-sub-value">10%抽成比例</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +14.2%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">处理纠纷数</span>
+                                <div class="stat-icon"><i class="bi bi-shield-alert"></i></div>
+                            </div>
+                            <div class="stat-value" id="adminDisputes">45</div>
+                            <div class="stat-sub-value">本月处理</div>
+                            <div class="stat-change negative"><i class="bi bi-trending-down"></i> -8.3%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">商家审核通过率</span>
+                                <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                            </div>
+                            <div class="stat-value" id="adminApproval">87%</div>
+                            <div class="stat-sub-value">本月数据</div>
+                            <div class="stat-change positive"><i class="bi bi-trending-up"></i> +3.5%</div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-bar-chart"></i>月度营收趋势</span>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="legend-line"></div><span>总收入</span></div>
+                                    <div class="legend-item"><div class="legend-line secondary"></div><span>抽成收入</span></div>
+                                </div>
+                            </div>
+                            <div class="bar-chart-container">
+                                <div class="bar-chart" id="adminBarChart"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-pie-chart"></i>收入来源分布</span>
+                            </div>
+                            <div class="pie-chart-container">
+                                <div class="pie-chart" style="background: conic-gradient(var(--gold-gradient-start) 0% 90%, var(--gold-gradient-mid) 90% 100%);">
+                                    <div class="pie-center">
+                                        <div class="pie-center-value">¥1.39亿</div>
+                                        <div class="pie-center-label">总收入</div>
+                                    </div>
+                                </div>
+                                <div class="pie-legend">
+                                    <div class="pie-legend-item"><div class="pie-color gold"></div><span class="pie-label">房费收入</span><span class="pie-value">90%</span></div>
+                                    <div class="pie-legend-item"><div class="pie-color gold-mid"></div><span class="pie-label">平台抽成</span><span class="pie-value">10%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-line-chart"></i>纠纷处理趋势</span>
+                            </div>
+                            <div class="line-chart-container">
+                                <div class="line-chart">
+                                    <div class="y-axis">
+                                        <div class="y-label">80</div>
+                                        <div class="y-label">60</div>
+                                        <div class="y-label">40</div>
+                                        <div class="y-label">20</div>
+                                        <div class="y-label">0</div>
+                                    </div>
+                                    <div class="line-chart-content">
+                                        <svg viewBox="0 0 400 200" width="100%" height="100%">
+                                            <defs>
+                                                <linearGradient id="disputeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" stop-color="#ef4444" />
+                                                    <stop offset="100%" stop-color="rgba(239, 68, 68, 0)" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path class="line-area" d="M0,200 L0,80 Q50,90 100,70 T200,50 T300,60 T400,90 L400,200 Z" fill="url(#disputeGradient)" />
+                                            <path class="line-path" d="M0,80 Q50,90 100,70 T200,50 T300,60 T400,90" stroke="#ef4444" />
+                                        </svg>
+                                    </div>
+                                    <div class="x-axis">
+                                        <div class="x-label">1月</div><div class="x-label">2月</div><div class="x-label">3月</div>
+                                        <div class="x-label">4月</div><div class="x-label">5月</div><div class="x-label">6月</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="bi bi-gauge"></i>平台运营指标</span>
+                            </div>
+                            <div class="progress-chart-container">
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">订单完成率</span><span class="progress-value">90%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">纠纷解决率</span><span class="progress-value">95%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 95%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">商家留存率</span><span class="progress-value">85%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-header"><span class="progress-label">用户满意度</span><span class="progress-value">94%</span></div>
+                                    <div class="progress-bar"><div class="progress-fill" style="width: 94%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div>
+                                <h3 class="table-title">待处理纠纷列表</h3>
+                                <p class="table-subtitle">按优先级排序</p>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>订单号</th>
+                                    <th>用户</th>
+                                    <th>商家</th>
+                                    <th>类型</th>
+                                    <th>状态</th>
+                                    <th>提交时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminDisputeList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>Luxury Stay - 数据报表中心 © 2026</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMonthDisplay();
+            initCharts();
+            initTables();
+            
+            document.addEventListener('click', function(e) {
+                const exportMenu = document.getElementById('exportMenu');
+                if (!e.target.closest('.export-dropdown')) {
+                    exportMenu.classList.remove('active');
+                }
+            });
+        });
+
+        function updateMonthDisplay() {
+            document.getElementById('monthDisplay').textContent = currentYear + '年' + months[currentMonth];
+            document.getElementById('monthSelect').value = currentMonth;
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateMonthDisplay();
+            refreshData();
+        }
+
+        function selectMonth(value) {
+            currentMonth = parseInt(value);
+            updateMonthDisplay();
+            refreshData();
+        }
+
+        function refreshData() {
+            initCharts();
+            initTables();
+        }
+
+        function toggleExportMenu() {
+            const exportMenu = document.getElementById('exportMenu');
+            exportMenu.classList.toggle('active');
+        }
+
+        function exportToCSV() {
+            const reportData = collectReportData();
+            let csvContent = '\uFEFF';
+            csvContent += reportData.headers.join(',') + '\n';
+            reportData.rows.forEach(row => {
+                csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+            downloadFile(csvContent, currentYear + '年' + months[currentMonth] + '_报表数据.csv', 'text/csv');
+            document.getElementById('exportMenu').classList.remove('active');
+        }
+
+        function exportToExcel() {
+            const reportData = collectReportData();
+            const worksheet = XLSX.utils.aoa_to_sheet([reportData.headers, ...reportData.rows]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, '报表数据');
+            XLSX.writeFile(workbook, currentYear + '年' + months[currentMonth] + '_报表数据.xlsx');
+            document.getElementById('exportMenu').classList.remove('active');
+        }
+
+        function exportToPDF() {
+            const contentArea = document.querySelector('.content-area');
+            if (!contentArea) {
+                alert('未找到报表内容区域');
+                return;
+            }
+            html2canvas(contentArea, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#0f0f0f'
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(currentYear + '年' + months[currentMonth] + '_报表数据.pdf');
+            }).catch(err => {
+                console.error('PDF导出失败:', err);
+                alert('PDF导出失败，请重试');
+            });
+            document.getElementById('exportMenu').classList.remove('active');
+        }
+
+        function exportToImage() {
+            const contentArea = document.querySelector('.content-area');
+            if (!contentArea) {
+                alert('未找到报表内容区域');
+                return;
+            }
+            html2canvas(contentArea, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#0f0f0f'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = currentYear + '年' + months[currentMonth] + '_报表截图.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error('图片导出失败:', err);
+                alert('图片导出失败，请重试');
+            });
+            document.getElementById('exportMenu').classList.remove('active');
+        }
+
+        function collectReportData() {
+            const activeSection = document.querySelector('.report-section.active');
+            if (!activeSection) return { headers: [], rows: [] };
+
+            const sectionId = activeSection.id;
+            const now = new Date();
+            const reportDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            if (sectionId === 'dashboard') {
+                return {
+                    headers: ['指标', '数值', '对比', '日期'],
+                    rows: [
+                        ['平台总用户', document.getElementById('dbTotalUsers').textContent, '+11.1%', reportDate],
+                        ['活跃商家', document.getElementById('dbActiveBusiness').textContent, '+6.6%', reportDate],
+                        ['本月订单', document.getElementById('dbMonthOrders').textContent, '+12.6%', reportDate],
+                        ['用户满意度', document.getElementById('dbRating').textContent, '+8.6%', reportDate]
+                    ]
+                };
+            } else if (sectionId === 'user') {
+                return {
+                    headers: ['指标', '数值', '对比', '日期'],
+                    rows: [
+                        ['新增用户', document.getElementById('userNewUsers').textContent, '+15.3%', reportDate],
+                        ['活跃用户', document.getElementById('userActiveUsers').textContent, '+8.2%', reportDate],
+                        ['订单数量', document.getElementById('userOrders').textContent, '+12.8%', reportDate],
+                        ['消费金额', document.getElementById('userRevenue').textContent, '+9.5%', reportDate]
+                    ]
+                };
+            } else if (sectionId === 'business') {
+                return {
+                    headers: ['指标', '数值', '对比', '日期'],
+                    rows: [
+                        ['入驻商家', document.getElementById('bizTotalBusiness').textContent, '+8.5%', reportDate],
+                        ['活跃商家', document.getElementById('bizActiveBusiness').textContent, '+12.3%', reportDate],
+                        ['商家订单', document.getElementById('bizOrders').textContent, '+15.6%', reportDate],
+                        ['商家收入', document.getElementById('bizRevenue').textContent, '+11.8%', reportDate]
+                    ]
+                };
+            } else if (sectionId === 'hotel') {
+                return {
+                    headers: ['指标', '数值', '对比', '日期'],
+                    rows: [
+                        ['酒店总数', document.getElementById('hotelTotal').textContent, '+5.2%', reportDate],
+                        ['平均评分', document.getElementById('hotelAvgRating').textContent, '+0.3%', reportDate],
+                        ['总订单数', document.getElementById('hotelOrders').textContent, '+18.2%', reportDate],
+                        ['平均房价', document.getElementById('hotelAvgPrice').textContent, '+8.6%', reportDate]
+                    ]
+                };
+            } else if (sectionId === 'admin') {
+                return {
+                    headers: ['指标', '数值', '对比', '日期'],
+                    rows: [
+                        ['平台营收', document.getElementById('adminRevenue').textContent, '+12.5%', reportDate],
+                        ['平台抽成', document.getElementById('adminCommission').textContent, '+12.5%', reportDate],
+                        ['商家分成', document.getElementById('adminBusinessIncome').textContent, '+12.5%', reportDate],
+                        ['待处理纠纷', document.getElementById('adminPendingDisputes').textContent, '-3', reportDate]
+                    ]
+                };
+            }
+            return { headers: [], rows: [] };
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function switchReport(reportId) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.report-section').forEach(section => section.classList.remove('active'));
+            document.querySelector(`[onclick="switchReport('${reportId}')"]`).classList.add('active');
+            document.getElementById(reportId).classList.add('active');
+            
+            const titles = {
+                'dashboard': { title: '仪表盘', subtitle: '实时数据概览与关键指标分析' },
+                'user': { title: '用户报表', subtitle: '用户行为分析与增长趋势' },
+                'business': { title: '商家报表', subtitle: '商家经营数据与业绩分析' },
+                'hotel': { title: '酒店报表', subtitle: '酒店运营数据与市场分析' },
+                'admin': { title: '管理员报表', subtitle: '平台运营管理与财务分析' }
+            };
+            document.getElementById('pageTitle').textContent = titles[reportId].title;
+            document.getElementById('pageSubtitle').textContent = titles[reportId].subtitle;
+        }
+
+        function initCharts() {
+            renderBarChart('dbBarChart', [2500, 3200, 2800, 3500, 4200, 4500], [2200, 2800, 2500, 3100, 3800, 4000]);
+            renderBarChart('userBarChart', [1200, 1500, 1800, 2100, 2400, 2800], [1000, 1300, 1600, 1900, 2200, 2500]);
+            renderBarChart('bizBarChart', [35, 42, 38, 45, 52, 58], [30, 38, 35, 40, 48, 52]);
+            renderBarChart('hotelBarChart', [45, 52, 48, 55, 62, 68], [40, 48, 45, 50, 58, 62]);
+            renderAdminBarChart('adminBarChart');
+        }
+
+        function renderBarChart(containerId, currentData, previousData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const maxValue = Math.max(...currentData, ...previousData) * 1.1;
+            const monthsShort = months.slice(currentMonth - 5, currentMonth + 1).map(m => m.replace('月', ''));
+            
+            container.innerHTML = monthsShort.map((month, index) => {
+                const currentHeight = (currentData[index] / maxValue) * 100;
+                const prevHeight = (previousData[index] / maxValue) * 100;
+                return `
+                    <div class="bar-group">
+                        <div class="bar-wrapper">
+                            <div class="bar bar-current" style="height: ${currentHeight}%">
+                                <span class="bar-value">${currentData[index].toLocaleString()}</span>
+                            </div>
+                            <div class="bar bar-previous" style="height: ${prevHeight}%">
+                                <span class="bar-value">${previousData[index].toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="month-label">${month}月</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAdminBarChart(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const revenueData = [10000, 11500, 10800, 12500, 13200, 13900];
+            const commissionData = [1000, 1150, 1080, 1250, 1320, 1390];
+            const maxValue = Math.max(...revenueData) * 1.1;
+            const monthsShort = months.slice(currentMonth - 5, currentMonth + 1).map(m => m.replace('月', ''));
+            
+            container.innerHTML = monthsShort.map((month, index) => {
+                const revenueHeight = (revenueData[index] / maxValue) * 100;
+                const commissionHeight = (commissionData[index] / maxValue) * 100;
+                return `
+                    <div class="bar-group">
+                        <div class="bar-wrapper">
+                            <div class="bar bar-current" style="height: ${revenueHeight}%">
+                                <span class="bar-value">${(revenueData[index]/1000).toFixed(0)}万</span>
+                            </div>
+                            <div class="bar bar-previous" style="height: ${commissionHeight}%">
+                                <span class="bar-value">${(commissionData[index]/1000).toFixed(0)}万</span>
+                            </div>
+                        </div>
+                        <div class="month-label">${month}月</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initTables() {
+            initHotelRanking();
+            initUserTopList();
+            initBizTopList();
+            initHotelTopList();
+            initDisputeList();
+        }
+
+        function initHotelRanking() {
+            const data = [
+                { rank: 1, name: '北京国贸大酒店', city: '北京', rating: 4.9, orders: 2856, occupancy: '92%' },
+                { rank: 2, name: '上海浦东丽思卡尔顿', city: '上海', rating: 4.8, orders: 2634, occupancy: '88%' },
+                { rank: 3, name: '广州四季酒店', city: '广州', rating: 4.8, orders: 2456, occupancy: '85%' },
+                { rank: 4, name: '深圳万象城君悦', city: '深圳', rating: 4.7, orders: 2189, occupancy: '82%' },
+                { rank: 5, name: '杭州西子湖四季', city: '杭州', rating: 4.9, orders: 2067, occupancy: '80%' }
+            ];
+            document.getElementById('dbHotelRanking').innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.city}</td>
+                    <td><i class="bi bi-star rating-star"></i>${item.rating}</td>
+                    <td>${item.orders.toLocaleString()}</td>
+                    <td><span class="badge success">${item.occupancy}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function initUserTopList() {
+            const data = [
+                { rank: 1, name: 'VIP001', registerDate: '2024-03-15', orders: 45, revenue: '¥286,500', level: '钻石' },
+                { rank: 2, name: 'VIP002', registerDate: '2024-05-20', orders: 38, revenue: '¥234,800', level: '钻石' },
+                { rank: 3, name: 'VIP003', registerDate: '2024-07-12', orders: 32, revenue: '¥198,600', level: '黄金' },
+                { rank: 4, name: 'VIP004', registerDate: '2024-09-08', orders: 28, revenue: '¥175,200', level: '黄金' },
+                { rank: 5, name: 'VIP005', registerDate: '2024-11-22', orders: 25, revenue: '¥156,800', level: '白银' }
+            ];
+            document.getElementById('userTopList').innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.registerDate}</td>
+                    <td>${item.orders}</td>
+                    <td>${item.revenue}</td>
+                    <td><span class="badge info">${item.level}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function initBizTopList() {
+            const data = [
+                { rank: 1, name: '万豪国际集团', city: '全国', star: '5星', orders: 8567, revenue: '¥3856万' },
+                { rank: 2, name: '希尔顿酒店集团', city: '全国', star: '5星', orders: 7234, revenue: '¥3256万' },
+                { rank: 3, name: '洲际酒店集团', city: '全国', star: '5星', orders: 6543, revenue: '¥2945万' },
+                { rank: 4, name: '凯悦酒店集团', city: '全国', star: '5星', orders: 5876, revenue: '¥2644万' },
+                { rank: 5, name: '精品民宿联盟', city: '全国', star: '4星', orders: 4523, revenue: '¥1357万' }
+            ];
+            document.getElementById('bizTopList').innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.city}</td>
+                    <td>${item.star}</td>
+                    <td>${item.orders.toLocaleString()}</td>
+                    <td>${item.revenue}</td>
+                </tr>
+            `).join('');
+        }
+
+        function initHotelTopList() {
+            const data = [
+                { rank: 1, name: '北京国贸大酒店', city: '北京', star: '5星', rating: 4.9, orders: 2856 },
+                { rank: 2, name: '上海浦东丽思卡尔顿', city: '上海', star: '5星', rating: 4.8, orders: 2634 },
+                { rank: 3, name: '广州四季酒店', city: '广州', star: '5星', rating: 4.8, orders: 2456 },
+                { rank: 4, name: '深圳万象城君悦', city: '深圳', star: '5星', rating: 4.7, orders: 2189 },
+                { rank: 5, name: '杭州西子湖四季', city: '杭州', star: '5星', rating: 4.9, orders: 2067 }
+            ];
+            document.getElementById('hotelTopList').innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.rank}</td>
+                    <td>${item.name}</td>
+                    <td>${item.city}</td>
+                    <td>${item.star}</td>
+                    <td><i class="bi bi-star rating-star"></i>${item.rating}</td>
+                    <td>${item.orders.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function initDisputeList() {
+            const data = [
+                { id: 'DS001', orderNo: 'BK20260601001', user: 'VIP001', business: '万豪国际', type: '服务投诉', status: '处理中', time: '2026-06-15 10:30' },
+                { id: 'DS002', orderNo: 'BK20260602003', user: 'VIP005', business: '希尔顿酒店', type: '退款纠纷', status: '待审核', time: '2026-06-14 15:20' },
+                { id: 'DS003', orderNo: 'BK20260603007', user: 'VIP012', business: '洲际酒店', type: '设施损坏', status: '已解决', time: '2026-06-13 09:15' },
+                { id: 'DS004', orderNo: 'BK20260604002', user: 'VIP008', business: '凯悦酒店', type: '服务投诉', status: '处理中', time: '2026-06-12 14:45' },
+                { id: 'DS005', orderNo: 'BK20260605009', user: 'VIP015', business: '精品民宿', type: '卫生问题', status: '待审核', time: '2026-06-11 11:30' }
+            ];
+            const statusColors = { '处理中': 'warning', '待审核': 'info', '已解决': 'success' };
+            document.getElementById('adminDisputeList').innerHTML = data.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.orderNo}</td>
+                    <td>${item.user}</td>
+                    <td>${item.business}</td>
+                    <td>${item.type}</td>
+                    <td><span class="badge ${statusColors[item.status]}">${item.status}</span></td>
+                    <td>${item.time}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

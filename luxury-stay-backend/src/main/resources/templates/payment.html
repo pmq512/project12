@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付页面 - Luxury Stay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a0a12;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f4d03f 50%, #d4af37 100%);
+            --text-white: #ffffff;
+            --bg-dark: #0a0a12;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --border-gold: rgba(212, 175, 55, 0.2);
+            --shadow-gold: 0 8px 32px rgba(212, 175, 55, 0.2);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0f0f1a 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: var(--text-white);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-weight: 700;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 18, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .payment-container {
+            padding: 120px 0 80px;
+        }
+
+        .payment-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            border: 1px solid var(--border-gold);
+            padding: 50px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            width: 50px;
+            height: 50px;
+            background: var(--gold-gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.4rem;
+        }
+
+        .hotel-info {
+            background: rgba(212, 175, 55, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .hotel-info img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .hotel-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hotel-location {
+            color: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .detail-item {
+            background: rgba(10, 10, 18, 0.5);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .detail-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gold-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .price-section {
+            background: rgba(212, 175, 55, 0.08);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .price-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+            padding-top: 25px;
+            margin-top: 10px;
+        }
+
+        .price-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .price-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .price-total {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .payment-methods {
+            margin-bottom: 40px;
+        }
+
+        .payment-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .payment-option {
+            background: rgba(10, 10, 18, 0.5);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            text-align: center;
+            position: relative;
+        }
+
+        .payment-option:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .payment-option.selected {
+            border-color: var(--secondary-color);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .payment-option.selected::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-option.selected::after i {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        .payment-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.8rem;
+        }
+
+        .payment-icon.wechat {
+            background: linear-gradient(135deg, #07c160 0%, #06ad56 100%);
+        }
+
+        .payment-icon.alipay {
+            background: linear-gradient(135deg, #1677ff 0%, #096dd9 100%);
+        }
+
+        .payment-icon.card {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+        }
+
+        .payment-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .payment-desc {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-pay {
+            width: 100%;
+            background: var(--gold-gradient);
+            color: var(--primary-color);
+            padding: 20px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-pay:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-pay:active {
+            transform: translateY(0);
+        }
+
+        .security-tips {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(34, 197, 94, 0.08);
+            border-radius: 14px;
+            border: 1px solid rgba(34, 197, 94, 0.15);
+        }
+
+        .security-tips i {
+            color: #22c55e;
+            margin-right: 8px;
+        }
+
+        .security-tips span {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer {
+            background: rgba(5, 5, 8, 0.8);
+            padding: 50px 0 30px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">LUXURY STAY</a>
+        </div>
+    </nav>
+
+    <div class="payment-container">
+        <div class="payment-card">
+            <h2 class="section-title">
+                <i class="fa-solid fa-credit-card"></i>
+                确认支付
+            </h2>
+
+            <div class="hotel-info">
+                <img th:src="${hotel.image}" th:alt="${hotel.name}">
+                <h3 class="hotel-name" th:text="${hotel.name}">豪华度假酒店</h3>
+                <div class="hotel-location">
+                    <i class="fa-solid fa-map-marker-alt" style="color: var(--secondary-color);"></i>
+                    <span th:text="${hotel.location}">北京市朝阳区</span>
+                </div>
+                <div class="booking-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <div class="detail-label">入住日期</div>
+                        <div class="detail-value" th:text="${booking.checkIn}">2024-01-15</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fa-solid fa-calendar-times"></i>
+                        </div>
+                        <div class="detail-label">退房日期</div>
+                        <div class="detail-value" th:text="${booking.checkOut}">2024-01-18</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fa-solid fa-bed"></i>
+                        </div>
+                        <div class="detail-label">房型</div>
+                        <div class="detail-value" th:text="${booking.roomType}">豪华大床房</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="detail-label">宾客人数</div>
+                        <div class="detail-value" th:text="${booking.adults + ' 位'}">2 位</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="price-section">
+                <h3 class="price-title">
+                    <i class="fa-solid fa-receipt"></i>
+                    费用明细
+                </h3>
+                <div class="price-row">
+                    <span class="price-label">房费</span>
+                    <span class="price-value">¥<span th:text="${roomRate}">2,000</span></span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">税费 (10%)</span>
+                    <span class="price-value">¥<span th:text="${tax}">200</span></span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">定金</span>
+                    <span class="price-value">¥<span th:text="${deposit}">500</span></span>
+                </div>
+                <div class="price-row">
+                    <span class="price-label">应付总额</span>
+                    <span class="price-total">¥<span th:text="${total}">2,700</span></span>
+                </div>
+            </div>
+
+            <div class="payment-methods">
+                <h3 class="payment-title">
+                    <i class="fa-solid fa-wallet"></i>
+                    选择支付方式
+                </h3>
+                <div class="payment-options">
+                    <div class="payment-option" data-method="wechat">
+                        <div class="payment-icon wechat">
+                            <i class="fa-brands fa-weixin"></i>
+                        </div>
+                        <div class="payment-name">微信支付</div>
+                        <div class="payment-desc">推荐使用</div>
+                    </div>
+                    <div class="payment-option" data-method="alipay">
+                        <div class="payment-icon alipay">
+                            <i class="fa-brands fa-alipay"></i>
+                        </div>
+                        <div class="payment-name">支付宝</div>
+                        <div class="payment-desc">安全便捷</div>
+                    </div>
+                    <div class="payment-option" data-method="card">
+                        <div class="payment-icon card">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="payment-name">银行卡</div>
+                        <div class="payment-desc">支持银联</div>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/booking/payment/{id}(id=${booking.id})}" method="post" id="paymentForm">
+                <input type="hidden" name="paymentMethod" id="paymentMethodInput" value="wechat">
+                <button type="submit" class="btn-pay">
+                    <i class="fa-solid fa-lock"></i>
+                    立即支付 ¥<span th:text="${total}">2,700</span>
+                </button>
+            </form>
+
+            <div class="security-tips">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>支付安全由 Luxury Stay 保障，您的支付信息将被加密保护</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        &copy; 2024 Luxury Stay. All rights reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const paymentMethodInput = document.getElementById('paymentMethodInput');
+
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    paymentMethodInput.value = this.dataset.method;
+                });
+            });
+
+            paymentOptions[0].click();
+        });
+    </script>
+</body>
+</html>

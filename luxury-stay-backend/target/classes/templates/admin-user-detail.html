@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>用户详情 - Luxury Stay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .font-serif {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+        }
+        .font-sans {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content" class="font-sans">
+            <div class="mb-4">
+                <a href="/admin/users" class="btn-action btn-outline">
+                    <i class="bi bi-arrow-left"></i>返回列表
+                </a>
+            </div>
+
+            <div th:if="${user != null}" class="row">
+                <div class="col-lg-4">
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h5><i class="bi bi-user-circle"></i>基本信息</h5>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-center mb-4">
+                                <div class="user-avatar mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                                    <i class="bi bi-user"></i>
+                                </div>
+                                <h4 th:text="${user.username}" class="font-bold"></h4>
+                                <span class="status-badge" th:class="${user.userType == 'BUSINESS' ? 'status-processing' : 'status-resolved'}">
+                                    <span th:text="${user.userType == 'BUSINESS' ? '商家用户' : '普通用户'}"></span>
+                                </span>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">用户ID</span>
+                                    <span class="font-semibold">#<span th:text="${user.id}"></span></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">邮箱</span>
+                                    <span th:text="${user.email} ?: '-'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">手机号</span>
+                                    <span th:text="${user.phone} ?: '-'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">身份证号</span>
+                                    <span th:text="${user.idCard} ?: '-'"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">状态</span>
+                                    <span class="status-badge" th:class="${user.enabled ? 'status-resolved' : 'status-rejected'}">
+                                        <span th:text="${user.enabled ? '正常' : '禁用'}"></span>
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-secondary">注册时间</span>
+                                    <span th:text="${user.createdAt}"></span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-4 border-top">
+                                <div class="d-flex gap-2">
+                                    <a th:if="${user.enabled}" 
+                                       th:href="@{/admin/users/{id}/disable(id=${user.id})}" 
+                                       class="btn-action btn-danger flex-1">
+                                        <i class="bi bi-ban"></i>禁用用户
+                                    </a>
+                                    <a th:unless="${user.enabled}" 
+                                       th:href="@{/admin/users/{id}/enable(id=${user.id})}" 
+                                       class="btn-action btn-success flex-1">
+                                        <i class="bi bi-check-circle"></i>启用用户
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="data-table mb-4">
+                        <div class="data-table-header">
+                            <h5><i class="bi bi-calendar-check"></i>用户订单</h5>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>订单号</th>
+                                    <th>酒店</th>
+                                    <th>房型</th>
+                                    <th>状态</th>
+                                    <th>金额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="booking : ${bookings}">
+                                    <td>#<span th:text="${booking.bookingNumber}"></span></td>
+                                    <td th:text="${booking.hotelName} ?: '-'"></td>
+                                    <td th:text="${booking.roomType}"></td>
+                                    <td>
+                                        <span class="status-badge" th:class="${booking.status == 'CONFIRMED' ? 'status-confirmed' : booking.status == 'COMPLETED' ? 'status-completed' : 'status-cancelled'}">
+                                            <span th:text="${booking.status}"></span>
+                                        </span>
+                                    </td>
+                                    <td>¥<span th:text="${booking.totalAmount}"></span></td>
+                                </tr>
+                                <tr th:if="${bookings.isEmpty()}">
+                                    <td colspan="5" class="empty-state">
+                                        <i class="bi bi-calendar"></i>
+                                        <h5>暂无订单</h5>
+                                        <p>该用户还没有订单记录</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="data-table-header">
+                            <h5><i class="bi bi-star"></i>用户评论</h5>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>酒店</th>
+                                    <th>评分</th>
+                                    <th>内容</th>
+                                    <th>状态</th>
+                                    <th>时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="review : ${reviews}">
+                                    <td th:text="${review.hotelName} ?: '-'"></td>
+                                    <td>
+                                        <div class="flex gap-1">
+                                            <i class="bi bi-star-fill text-yellow-500" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                                            <i class="bi bi-star text-gray-300" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}"></i>
+                                        </div>
+                                    </td>
+                                    <td th:text="${review.content}"></td>
+                                    <td>
+                                        <span class="status-badge" th:class="${review.status == 'APPROVED' ? 'status-resolved' : review.status == 'PENDING' ? 'status-pending' : 'status-rejected'}">
+                                            <span th:text="${review.status}"></span>
+                                        </span>
+                                    </td>
+                                    <td th:text="${review.createdAt}"></td>
+                                </tr>
+                                <tr th:if="${reviews.isEmpty()}">
+                                    <td colspan="5" class="empty-state">
+                                        <i class="bi bi-star"></i>
+                                        <h5>暂无评论</h5>
+                                        <p>该用户还没有评论记录</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div th:unless="${user != null}" class="empty-state">
+                <i class="bi bi-exclamation-circle"></i>
+                <h5>用户不存在</h5>
+                <p>未找到指定的用户信息</p>
+            </div>
+    </div>
+</body>
+</html>

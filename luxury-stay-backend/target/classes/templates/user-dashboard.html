@@ -1,0 +1,185 @@
+<div th:fragment="content" class="font-sans">
+    <!-- 欢迎区域 -->
+    <div style="background: var(--gold-gradient); border-radius: 20px; padding: 35px; margin-bottom: 25px; box-shadow: var(--shadow-gold);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="margin: 0; font-weight: 700; color: var(--bg-dark); font-size: 1.8rem;">欢迎回来，<span th:text="${user != null ? user.username : '用户'}">用户</span></h2>
+                <p style="margin: 10px 0 0 0; color: var(--bg-dark); opacity: 0.8; font-size: 1.05rem;">今天也是美好的一天，开始您的奢华之旅吧！</p>
+            </div>
+            <div style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-person-circle" style="font-size: 4rem; color: var(--bg-dark);"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon" style="background: rgba(212, 175, 55, 0.1);">
+                    <i class="bi bi-calendar-check" style="color: var(--gold-primary);"></i>
+                </div>
+            </div>
+            <p class="stat-label">我的预订</p>
+            <div class="stat-value" th:text="${bookingCount}">5</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon" style="background: rgba(251, 191, 36, 0.1);">
+                    <i class="bi bi-star" style="color: #fbbf24;"></i>
+                </div>
+            </div>
+            <p class="stat-label">我的评论</p>
+            <div class="stat-value" th:text="${reviewCount}">3</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1);">
+                    <i class="bi bi-heart" style="color: #ef4444;"></i>
+                </div>
+            </div>
+            <p class="stat-label">收藏酒店</p>
+            <div class="stat-value" th:text="${wishlistCount}">8</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1);">
+                    <i class="bi bi-wallet" style="color: #22c55e;"></i>
+                </div>
+            </div>
+            <p class="stat-label">累计消费</p>
+            <div class="stat-value">¥<span th:text="${totalSpent}">2,850</span></div>
+        </div>
+    </div>
+    
+    <!-- 近期预订 -->
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5>
+                <i class="bi bi-calendar-check"></i>
+                近期预订
+            </h5>
+            <a th:href="@{/user/bookings}" style="color: var(--gold-primary); font-size: 0.9rem;">查看全部</a>
+        </div>
+        
+        <div th:if="${upcomingBookings != null and !upcomingBookings.empty}" style="padding: 25px;">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div th:each="booking : ${upcomingBookings}" style="background: white; border-radius: 12px; padding: 20px; border: 1px solid rgba(212, 175, 55, 0.15); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 80px; height: 60px; border-radius: 10px; overflow: hidden;">
+                            <img th:src="${booking.hotelImage}" alt="${booking.hotelName}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div>
+                            <h6 style="margin: 0; font-weight: 700; color: var(--text-primary);" th:text="${booking.hotelName}">豪华度假酒店</h6>
+                            <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">
+                                <i class="bi bi-calendar" style="margin-right: 5px;"></i>
+                                <span th:text="${#temporals.format(booking.checkIn, 'yyyy-MM-dd')}">2024-01-15</span> - 
+                                <span th:text="${#temporals.format(booking.checkOut, 'yyyy-MM-dd')}">2024-01-18</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span th:class="${booking.status == 'CONFIRMED' ? 'badge bg-success' : booking.status == 'PENDING' ? 'badge bg-warning' : 'badge bg-secondary'}"
+                              th:text="${booking.status == 'CONFIRMED' ? '已确认' : booking.status == 'PENDING' ? '待确认' : booking.status}">已确认</span>
+                        <a th:href="@{/user/bookings/detail/{id}(id=${booking.id})}" class="btn-action btn-outline">
+                            <i class="bi bi-eye"></i>
+                            详情
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${upcomingBookings == null or upcomingBookings.empty}" style="padding: 40px; text-align: center;">
+            <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--text-secondary);"></i>
+            <h5 style="margin: 15px 0 10px 0; color: var(--text-primary);">暂无即将到来的预订</h5>
+            <p style="margin: 0; color: var(--text-secondary);">快去浏览酒店，开启您的奢华之旅吧！</p>
+            <a th:href="@{/hotels}" class="btn-action btn-primary" style="margin-top: 20px;">
+                <i class="bi bi-building"></i>
+                浏览酒店
+            </a>
+        </div>
+    </div>
+    
+    <!-- 评论和收藏 -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+        <!-- 我的评论 -->
+        <div class="data-table">
+            <div class="data-table-header">
+                <h5>
+                    <i class="bi bi-star"></i>
+                    我的评论
+                </h5>
+                <a th:href="@{/user/reviews}" style="color: var(--gold-primary); font-size: 0.9rem;">查看全部</a>
+            </div>
+            
+            <div th:if="${recentReviews != null and !recentReviews.empty}" style="padding: 25px;">
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div th:each="review : ${recentReviews}" style="background: white; border-radius: 12px; padding: 18px; border: 1px solid rgba(212, 175, 55, 0.15);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <h6 style="margin: 0; font-weight: 600; color: var(--text-primary);" th:text="${review.hotelName}">豪华度假酒店</h6>
+                            <div style="display: flex; gap: 2px;">
+                                <i th:each="i : ${#numbers.sequence(1,5)}" 
+                                   class="bi bi-star-fill" 
+                                   th:classappend="${i <= review.rating ? 'text-yellow-500' : 'text-gray-300'}"
+                                   style="font-size: 0.85rem;"></i>
+                            </div>
+                        </div>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;" th:text="${review.content}">非常满意的入住体验...</p>
+                        <p style="margin: 8px 0 0 0; color: var(--text-secondary); font-size: 0.8rem;" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">2024-01-15</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${recentReviews == null or recentReviews.empty}" style="padding: 30px; text-align: center;">
+                <i class="bi bi-star" style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                <p style="margin: 10px 0 0 0; color: var(--text-secondary);">暂无评论</p>
+            </div>
+        </div>
+        
+        <!-- 收藏的酒店 -->
+        <div class="data-table">
+            <div class="data-table-header">
+                <h5>
+                    <i class="bi bi-heart"></i>
+                    收藏的酒店
+                </h5>
+                <a th:href="@{/user/wishlist}" style="color: var(--gold-primary); font-size: 0.9rem;">查看全部</a>
+            </div>
+            
+            <div th:if="${wishlistedHotels != null and !wishlistedHotels.empty}" style="padding: 25px;">
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div th:each="hotel : ${wishlistedHotels}" style="background: white; border-radius: 12px; padding: 15px; border: 1px solid rgba(212, 175, 55, 0.15); display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 70px; height: 55px; border-radius: 10px; overflow: hidden; flex-shrink: 0;">
+                            <img th:src="${hotel.image}" alt="${hotel.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="flex: 1;">
+                            <h6 style="margin: 0; font-weight: 600; color: var(--text-primary);" th:text="${hotel.name}">豪华度假酒店</h6>
+                            <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;" th:text="${hotel.location}">北京市朝阳区</p>
+                            <p style="margin: 5px 0 0 0; color: var(--gold-primary); font-weight: 600;" th:text="'¥' + ${hotel.price} + '/晚'">¥1,288/晚</p>
+                        </div>
+                        <button onclick="removeWishlist(${hotel.id})" class="btn-action btn-danger" style="padding: 8px;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${wishlistedHotels == null or wishlistedHotels.empty}" style="padding: 30px; text-align: center;">
+                <i class="bi bi-heart" style="font-size: 2.5rem; color: var(--text-secondary);"></i>
+                <p style="margin: 10px 0 0 0; color: var(--text-secondary);">暂无收藏</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function removeWishlist(hotelId) {
+            if (confirm('确定要取消收藏吗？')) {
+                window.location.href = '/user/wishlist/remove/' + hotelId;
+            }
+        }
+    </script>
+</div>

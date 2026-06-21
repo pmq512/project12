@@ -1,0 +1,137 @@
+<div th:fragment="content" class="font-sans">
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-building"></i> 商家列表</h5>
+            <div class="table-actions">
+                <div class="search-filter">
+                    <select onchange="window.location.href='?status='+this.value">
+                        <option value="" th:selected="${selectedStatus == null || selectedStatus == ''}">全部状态</option>
+                        <option value="enabled" th:selected="${selectedStatus == 'enabled'}">已启用</option>
+                        <option value="disabled" th:selected="${selectedStatus == 'disabled'}">待审核</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>商家ID</th>
+                    <th>商家名称</th>
+                    <th>联系人</th>
+                    <th>邮箱</th>
+                    <th>手机号</th>
+                    <th>营业执照</th>
+                    <th>状态</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="business : ${businesses}">
+                    <td>#<span th:text="${business.id}"></span></td>
+                    <td>
+                        <a th:href="@{/admin/businesses/{id}(id=${business.id})}" class="fw-semibold" style="text-decoration: none; color: var(--text-primary);">
+                            <span th:text="${business.username}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${business.name} ?: '-'"></td>
+                    <td th:text="${business.email} ?: '-'"></td>
+                    <td th:text="${business.phone} ?: '-'"></td>
+                    <td>
+                        <span th:if="${business.businessLicense != null}" class="text-success">
+                            <i class="bi bi-check-circle"></i> 已上传
+                        </span>
+                        <span th:unless="${business.businessLicense != null}" class="text-warning">
+                            <i class="bi bi-x-circle"></i> 未上传
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-cancelled" th:if="${business.blacklisted}">已拉黑</span>
+                        <span class="status-badge status-confirmed" th:if="${business.enabled && !business.blacklisted}">已通过</span>
+                        <span class="status-badge status-pending" th:if="${!business.enabled && !business.blacklisted}">待审核</span>
+                    </td>
+                    <td th:text="${business.createdAt}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/admin/businesses/{id}(id=${business.id})}" class="btn-action btn-info" style="padding: 6px 12px; font-size: 0.8rem;">
+                                <i class="bi bi-eye"></i> 查看
+                            </a>
+                            <a th:if="${!business.enabled && !business.blacklisted}" 
+                               th:href="@{/admin/businesses/{id}/approve(id=${business.id})}" 
+                               class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;"
+                               onclick="return confirm('确定通过该商家审核吗？')">
+                                <i class="bi bi-check-circle"></i> 通过
+                            </a>
+                            <a th:if="${business.enabled && !business.blacklisted}" 
+                               th:href="@{/admin/businesses/{id}/reject(id=${business.id})}" 
+                               class="btn-action btn-warning" style="padding: 6px 12px; font-size: 0.8rem;"
+                               onclick="return confirm('确定驳回该商家吗？')">
+                                <i class="bi bi-x-circle"></i> 驳回
+                            </a>
+                            <button th:if="${!business.blacklisted}" 
+                                    type="button"
+                                    class="btn-action btn-danger" style="padding: 6px 12px; font-size: 0.8rem;"
+                                    th:data-id="${business.id}"
+                                    th:data-name="${business.username}"
+                                    onclick="showBlacklistModal(this)">
+                                <i class="bi bi-shield-x"></i> 拉黑
+                            </button>
+                            <form th:if="${business.blacklisted}" 
+                                  th:action="@{/admin/businesses/{id}/unblacklist(id=${business.id})}" 
+                                  method="post" style="display:inline;">
+                                <button type="submit" class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;"
+                                        onclick="return confirm('确定解除拉黑该商家吗？')">
+                                    <i class="bi bi-shield-check"></i> 解除
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${businesses.isEmpty()}">
+                    <td colspan="9" class="empty-state">
+                        <i class="bi bi-building"></i>
+                        <h5>暂无商家</h5>
+                        <p>系统中还没有商家数据</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 拉黑商家模态框 -->
+    <div class="modal fade" id="blacklistModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 22px; border: 2px solid rgba(212,175,55,0.3);">
+                <div class="modal-header" style="background: var(--gold-gradient); border-radius: 20px 20px 0 0;">
+                    <h5 class="modal-title fw-bold" style="color: var(--bg-dark);"><i class="bi bi-shield-x"></i> 拉黑商家</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="blacklistForm" method="post">
+                    <div class="modal-body p-4">
+                        <p class="mb-3">您即将拉黑商家：<strong id="blacklistBusinessName"></strong></p>
+                        <p class="text-muted small mb-3">拉黑后，该商家将被禁用，其所有酒店将自动下架。此操作不可撤销（需手动解除）。</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">拉黑原因</label>
+                            <textarea name="reason" class="form-control" rows="3" required placeholder="请输入拉黑原因，将记录备案..." style="border-radius: 12px; border: 2px solid rgba(212,175,55,0.3);"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(212,175,55,0.2);">
+                        <button type="button" class="btn-action btn-outline" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn-action btn-danger">确认拉黑</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showBlacklistModal(btn) {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            document.getElementById('blacklistBusinessName').textContent = name;
+            document.getElementById('blacklistForm').action = '/admin/businesses/' + id + '/blacklist';
+            const modal = new bootstrap.Modal(document.getElementById('blacklistModal'));
+            modal.show();
+        }
+    </script>
+</div>

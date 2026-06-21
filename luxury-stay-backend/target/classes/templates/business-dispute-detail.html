@@ -1,0 +1,94 @@
+<div th:fragment="content" class="font-sans">
+    <div class="mb-4">
+        <a th:href="@{/business/disputes}" class="btn-action btn-secondary">
+            <i class="bi bi-arrow-left"></i>返回列表
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-shield-alert me-2"></i>纠纷详情</h5>
+                <span class="status-badge" th:classappend="${'status-' + dispute.status.toLowerCase()}" 
+                      th:text="${dispute.status == 'PENDING' ? '待处理' : (dispute.status == 'RESOLVED' ? '已解决' : '已拒绝')}"></span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">纠纷ID</span>
+                        <span class="detail-value">#<span th:text="${dispute.id}"></span></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">关联订单</span>
+                        <span class="detail-value">#<span th:text="${dispute.bookingId}"></span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">申请人</span>
+                        <span class="detail-value">
+                            <span class="status-badge" th:class="${dispute.applicantType == 'USER' ? 'status-resolved' : 'status-processing'}">
+                                <span th:text="${dispute.applicantType == 'USER' ? '用户' : '商家'}"></span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">申请人ID</span>
+                        <span class="detail-value">#<span th:text="${dispute.applicantId}"></span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">申请时间</span>
+                        <span class="detail-value" th:text="${dispute.createdAt}"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <span class="detail-label">解决时间</span>
+                        <span class="detail-value" th:text="${dispute.resolvedAt != null ? dispute.resolvedAt : '--'}"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="detail-item">
+                    <span class="detail-label">申请原因</span>
+                    <div class="detail-value bg-gray-50 p-4 rounded-lg">
+                        <p th:text="${dispute.reason}"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${dispute.evidence != null}" class="mb-4">
+                <div class="detail-item">
+                    <span class="detail-label">证据材料</span>
+                    <div class="detail-value bg-gray-50 p-4 rounded-lg">
+                        <p th:text="${dispute.evidence}"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${dispute.status == 'RESOLVED' || dispute.status == 'REJECTED'}" class="mb-4">
+                <div class="detail-item">
+                    <span class="detail-label">管理员处理意见</span>
+                    <div class="detail-value bg-gray-50 p-4 rounded-lg">
+                        <p th:text="${dispute.adminNote != null ? dispute.adminNote : '--'}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

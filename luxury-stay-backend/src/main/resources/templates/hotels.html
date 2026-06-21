@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒店列表 - LuxuryStay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f1a;
+            --primary-light: #1a1a2e;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --text-white: #ffffff;
+            --text-gray: #5a5a6e;
+            --text-light: #8888a0;
+            --text-muted: #aaaabe;
+            --bg-dark: #0f0f1a;
+            --bg-light: #f8f8fc;
+            --bg-card: #ffffff;
+            --border-color: #e8e8f0;
+            --border-light: #f0f0f5;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.12);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.65;
+            color: #2d2d44;
+            background-color: var(--bg-light);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', 'Inter', serif;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--primary-color);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar {
+            background: var(--bg-dark);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 3px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            font-size: 0.925rem;
+            padding: 0.65rem 1.1rem !important;
+            margin: 0 0.15rem;
+            border-radius: 10px;
+            transition: var(--transition-fast);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .navbar-nav .nav-link.active {
+            color: var(--secondary-color) !important;
+            background: rgba(212, 175, 55, 0.12);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 13px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.925rem;
+            letter-spacing: 0.5px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-color) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.45);
+            color: var(--text-white);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(15, 15, 26, 0.92) 0%, rgba(26, 26, 46, 0.88) 100%), 
+                        url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20lobby%20elegant%20interior%20golden%20lighting&image_size=landscape_16_9');
+            background-size: cover;
+            background-position: center;
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero-search-box {
+            max-width: 600px;
+            margin: 30px auto 0;
+        }
+
+        .hero-search-form {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 6px 6px 6px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .hero-search-form:focus-within {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(233, 69, 96, 0.5);
+            box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.15);
+        }
+
+        .hero-search-form i.fa-search {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.1rem;
+            margin-right: 12px;
+        }
+
+        .hero-search-form input {
+            flex: 1;
+            padding: 14px 0;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: transparent;
+            color: #fff;
+        }
+
+        .hero-search-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-search-form button {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #e8576e 100%);
+            border: none;
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .hero-search-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .results-section {
+            padding: 80px 0;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .results-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .results-count {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .sort-select {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.925rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            outline: none;
+            min-width: 160px;
+        }
+
+        .sort-select:hover,
+        .sort-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        }
+
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 32px;
+        }
+
+        .hotel-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+            border: 1px solid var(--border-light);
+            position: relative;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .hotel-card-image {
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hotel-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .hotel-card:hover .hotel-card-image img {
+            transform: scale(1.08);
+        }
+
+        .hotel-card-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: var(--secondary-color);
+            color: var(--text-white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hotel-card-badge i {
+            font-size: 0.65rem;
+        }
+
+        .hotel-card-content {
+            padding: 28px;
+        }
+
+        .hotel-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .hotel-card-name {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            transition: var(--transition-fast);
+        }
+
+        .hotel-card:hover .hotel-card-name {
+            color: var(--secondary-color);
+        }
+
+        .hotel-card-location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-gray);
+            font-size: 0.925rem;
+        }
+
+        .hotel-card-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(212, 175, 55, 0.1);
+            padding: 8px 14px;
+            border-radius: 10px;
+        }
+
+        .hotel-card-rating-value {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .hotel-card-rating-text {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+        }
+
+        .hotel-card-facilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .hotel-card-facility {
+            padding: 6px 14px;
+            background: var(--bg-light);
+            border-radius: 20px;
+            font-size: 0.825rem;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hotel-card-facility i {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+        }
+
+        .hotel-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .hotel-card-price {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .hotel-card-price-symbol {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .hotel-card-price-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .hotel-card-price-unit {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-left: 4px;
+        }
+
+        .card-hotel-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.925rem;
+            text-decoration: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .card-hotel-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+            color: var(--text-white);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .no-results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .no-results-text {
+            color: var(--text-gray);
+        }
+
+        .footer {
+            background: var(--bg-dark);
+            padding: 80px 0 50px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 60px;
+        }
+
+        .footer-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 35px;
+            margin-top: 35px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.25rem;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hotels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hotel-card-footer {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .card-hotel-link {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">LuxuryStay</a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/destinations">目的地</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/hotels">酒店</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/auth/login">登录</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary-custom" href="/auth/register">注册</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/profile">
+                            <i class="fa-solid fa-user"></i>
+                            <span sec:authentication="name"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('BUSINESS')">
+                        <a class="btn btn-primary-custom" href="/business">商家后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="btn btn-primary-custom" href="/admin">管理后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="btn btn-primary-custom" href="/user">用户中心</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form action="/auth/logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light">退出登录</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">探索精品酒店</h1>
+            <p class="hero-subtitle">精心挑选的顶级酒店，为您呈现非凡体验</p>
+            <div class="hero-search-box">
+                <form action="/search" method="get" class="hero-search-form">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" name="location" placeholder="搜索酒店名称或城市..." th:value="${param.location}">
+                    <button type="submit"><i class="fa-solid fa-compass"></i> 搜索</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-section">
+        <div class="container">
+            <div class="results-header">
+                <div>
+                    <h2 class="results-title">全部酒店</h2>
+                    <p class="results-count" th:text="'共 ' + ${hotels.size()} + ' 家酒店'"></p>
+                </div>
+                <div>
+                    <select class="sort-select" onchange="sortHotels(this.value)">
+                        <option value="recommend">推荐排序</option>
+                        <option value="price-low">价格从低到高</option>
+                        <option value="price-high">价格从高到低</option>
+                        <option value="rating">评分优先</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="hotels-grid" th:if="${hotels != null && !hotels.isEmpty()}">
+                <div class="hotel-card" th:each="hotel : ${hotels}">
+                    <div class="hotel-card-image">
+                        <img th:src="${hotel.image}" th:alt="${hotel.name}">
+                        <span class="hotel-card-badge">
+                            <i class="fa-solid fa-star"></i>
+                            <span th:text="${hotel.star} + '星级'"></span>
+                        </span>
+                    </div>
+                    <div class="hotel-card-content">
+                        <div class="hotel-card-header">
+                            <div>
+                                <h3 class="hotel-card-name" th:text="${hotel.name}"></h3>
+                                <div class="hotel-card-location">
+                                    <i class="fa-solid fa-map-marker-alt"></i>
+                                    <span th:text="${hotel.location}"></span>
+                                </div>
+                            </div>
+                            <div class="hotel-card-rating">
+                                <span class="hotel-card-rating-value" th:text="${hotel.rating}"></span>
+                                <span class="hotel-card-rating-text">分</span>
+                            </div>
+                        </div>
+                        
+                        <div class="hotel-card-facilities">
+                            <span class="hotel-card-facility" th:if="${hotel.facilities != null && hotel.facilities.contains('免费WiFi')}">
+                                <i class="fa-solid fa-wifi"></i> WiFi
+                            </span>
+                            <span class="hotel-card-facility" th:if="${hotel.facilities != null && hotel.facilities.contains('停车场')}">
+                                <i class="fa-solid fa-car"></i> 停车场
+                            </span>
+                            <span class="hotel-card-facility" th:if="${hotel.facilities != null && hotel.facilities.contains('游泳池')}">
+                                <i class="fa-solid fa-swimmer"></i> 泳池
+                            </span>
+                            <span class="hotel-card-facility" th:if="${hotel.facilities != null && hotel.facilities.contains('健身房')}">
+                                <i class="fa-solid fa-dumbbell"></i> 健身
+                            </span>
+                        </div>
+
+                        <div class="hotel-card-footer">
+                            <div class="hotel-card-price">
+                                <span class="hotel-card-price-symbol">¥</span>
+                                <span class="hotel-card-price-value" th:text="${hotel.price}"></span>
+                                <span class="hotel-card-price-unit">/晚</span>
+                            </div>
+                            <a th:href="@{/hotels/{id}(id=${hotel.id})}" class="card-hotel-link">
+                                查看详情 <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-results" th:if="${hotels == null || hotels.isEmpty()}">
+                <div class="no-results-icon">
+                    <i class="fa-solid fa-hotel"></i>
+                </div>
+                <h3 class="no-results-title">暂无酒店</h3>
+                <p class="no-results-text">当前没有符合条件的酒店，请尝试其他筛选条件</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">LuxuryStay</div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 LuxuryStay. All rights reserved. | 京ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function sortHotels(sortBy) {
+            window.location.href = '/hotels?sort=' + sortBy;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<div th:fragment="content" class="font-sans">
+    <div th:if="${success}" class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger">
+        <i class="bi bi-exclamation-circle me-2"></i><span th:text="${error}"></span>
+    </div>
+    
+    <div class="row g-4 mb-6">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">全部订单</p>
+                        <h3 class="stat-value" th:text="${bookings.size()}">0</h3>
+                    </div>
+                    <div class="stat-icon blue"><i class="bi bi-list-ol"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">待确认</p>
+                        <h3 class="stat-value" th:text="${#lists.size(bookings.?[status == 'PENDING'])}">0</h3>
+                    </div>
+                    <div class="stat-icon orange"><i class="bi bi-clock"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">已确认</p>
+                        <h3 class="stat-value" th:text="${#lists.size(bookings.?[status == 'CONFIRMED'])}">0</h3>
+                    </div>
+                    <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">待退款</p>
+                        <h3 class="stat-value" th:text="${#lists.size(bookings.?[status == 'USER_CANCELLED'])}">0</h3>
+                    </div>
+                    <div class="stat-icon red"><i class="bi bi-arrow-left-circle"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-calendar-check me-2"></i>订单列表</h5>
+            <div class="text-white/70 text-sm">共 <span th:text="${bookings.size()}">0</span> 条订单</div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>酒店</th>
+                        <th>客户</th>
+                        <th>入住日期</th>
+                        <th>退房日期</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="booking : ${bookings}">
+                        <td>#<span th:text="${booking.id}"></span></td>
+                        <td th:text="${booking.hotelName}"></td>
+                        <td th:text="${booking.guestName}"></td>
+                        <td th:text="${booking.checkIn}"></td>
+                        <td th:text="${booking.checkOut}"></td>
+                        <td>¥<span th:text="${booking.totalPrice}"></span></td>
+                        <td>
+                            <span class="status-badge" th:classappend="${'status-' + booking.status.toLowerCase()}" 
+                                  th:text="${booking.status}"></span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:if="${booking.status == 'PENDING'}" 
+                                   th:href="@{/business/bookings/confirm/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-confirm" title="确认订单">
+                                    <i class="bi bi-check"></i>确认
+                                </a>
+                                <a th:if="${booking.status == 'PENDING'}" 
+                                   th:href="@{/business/bookings/cancel/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-cancel" title="取消订单"
+                                   onclick="return confirm('确定要取消这个订单吗？')">
+                                    <i class="bi bi-x"></i>取消
+                                </a>
+                                <a th:if="${booking.status == 'CONFIRMED'}" 
+                                   th:href="@{/business/bookings/complete/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-complete" title="完成订单">
+                                    <i class="bi bi-check-all"></i>完成
+                                </a>
+                                <a th:if="${booking.status == 'CONFIRMED'}" 
+                                   th:href="@{/business/bookings/noshow/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-warning" title="标记未入住"
+                                   onclick="return confirm('确定要标记为未入住吗？')">
+                                    <i class="bi bi-person-x"></i>未入住
+                                </a>
+                                <a th:if="${booking.status == 'USER_CANCELLED'}" 
+                                   th:href="@{/business/bookings/confirm-refund/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-refund" title="确认退款">
+                                    <i class="bi bi-arrow-return-left"></i>退款
+                                </a>
+                                <a th:if="${booking.status == 'USER_CANCELLED'}" 
+                                   th:href="@{/business/bookings/reject-refund/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-cancel" title="拒绝退款"
+                                   onclick="return confirm('确定要拒绝退款吗？')">
+                                    <i class="bi bi-x-circle"></i>拒绝
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${bookings.isEmpty()}">
+                        <td colspan="8" class="text-center py-12">
+                            <div class="inline-flex flex-col items-center">
+                                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                    <i class="bi bi-calendar-x text-gray-400 text-3xl"></i>
+                                </div>
+                                <p class="text-gray-500 mb-4">暂无订单数据</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,106 @@
+<div th:fragment="content" class="font-sans">
+    <div class="booking-detail-container" style="max-width: 800px; margin: 0 auto; padding: 25px;">
+        <div style="background: white; border-radius: 16px; padding: 30px; border: 1px solid rgba(212, 175, 55, 0.15);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h3 style="margin: 0; font-weight: 700; color: var(--text-primary);" th:text="${booking.hotelName}">酒店名称</h3>
+                    <p style="margin: 5px 0 0 0; color: var(--text-secondary);" th:text="${booking.hotelLocation}">酒店地址</p>
+                </div>
+                <span th:class="${booking.status == 'PENDING' ? 'badge bg-warning' : booking.status == 'CONFIRMED' ? 'badge bg-success' : booking.status == 'COMPLETED' ? 'badge bg-success' : booking.status == 'CANCELLED' ? 'badge bg-secondary' : booking.status == 'USER_CANCELLED' ? 'badge bg-secondary' : booking.status == 'DISPUTE' ? 'badge bg-danger' : 'badge bg-info'}"
+                      th:text="${booking.status == 'PENDING' ? '待确认' : booking.status == 'CONFIRMED' ? '已确认' : booking.status == 'COMPLETED' ? '已完成' : booking.status == 'CANCELLED' ? '已取消' : booking.status == 'USER_CANCELLED' ? '用户取消' : booking.status == 'DISPUTE' ? '纠纷中' : '已退款'}">状态</span>
+            </div>
+            
+            <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                <div style="width: 250px; height: 180px; border-radius: 12px; overflow: hidden; flex-shrink: 0;">
+                    <img th:src="${booking.hotelImage}" alt="${booking.hotelName}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">订单编号</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.bookingNumber}">BK001</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">预订时间</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${#temporals.format(booking.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-15 14:30</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">入住日期</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${#temporals.format(booking.checkIn, 'yyyy-MM-dd')}">2024-01-15</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">退房日期</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${#temporals.format(booking.checkOut, 'yyyy-MM-dd')}">2024-01-18</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">房型</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.roomType}">豪华房</p>
+                        </div>
+                        <div>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">人数</p>
+                            <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.adults + '位成人' + (booking.children > 0 ? '，' + booking.children + '位儿童' : '')}">2位成人</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(212, 175, 55, 0.1); padding-top: 20px; margin-bottom: 30px;">
+                <h5 style="margin: 0 0 15px 0; font-weight: 600; color: var(--text-primary);">联系信息</h5>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">联系人</p>
+                        <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.guestName}">张三</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">联系电话</p>
+                        <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.phone != null ? booking.phone : '未填写'}">13800138000</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">电子邮箱</p>
+                        <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.email != null ? booking.email : '未填写'}">user@example.com</p>
+                    </div>
+                    <div>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;">身份证号</p>
+                        <p style="margin: 5px 0 0 0; font-weight: 600; color: var(--text-primary);" th:text="${booking.idCard != null ? booking.idCard : '未填写'}">110101199001011234</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(212, 175, 55, 0.1); padding-top: 20px; margin-bottom: 30px;" th:if="${booking.specialRequests != null and !booking.specialRequests.empty}">
+                <h5 style="margin: 0 0 10px 0; font-weight: 600; color: var(--text-primary);">特殊要求</h5>
+                <p style="margin: 0; color: var(--text-secondary);" th:text="${booking.specialRequests}">无特殊要求</p>
+            </div>
+
+            <div style="border-top: 1px solid rgba(212, 175, 55, 0.1); padding-top: 20px; margin-bottom: 30px;">
+                <h5 style="margin: 0 0 15px 0; font-weight: 600; color: var(--text-primary);">费用明细</h5>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: var(--text-secondary);">订单金额</span>
+                    <span style="font-weight: 600; color: var(--text-primary);">¥<span th:text="${booking.totalPrice}"></span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;" th:if="${booking.depositAmount != null && booking.depositAmount > 0}">
+                    <span style="color: var(--text-secondary);">定金</span>
+                    <span style="font-weight: 600; color: var(--text-primary);">¥<span th:text="${booking.depositAmount}"></span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px dashed rgba(212, 175, 55, 0.2);">
+                    <span style="font-weight: 600; color: var(--text-primary);">合计</span>
+                    <span style="font-size: 1.3rem; font-weight: 700; color: var(--gold-primary);">¥<span th:text="${booking.totalPrice}"></span></span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <a th:href="@{/user/bookings}" class="btn-action btn-outline">
+                    <i class="bi bi-arrow-left"></i>
+                    返回列表
+                </a>
+                <button th:if="${booking.status == 'PENDING' or booking.status == 'CONFIRMED'}" class="btn-action btn-warning" th:onclick="'cancelBooking(' + ${booking.id} + ')'">
+                    <i class="bi bi-x-circle"></i>
+                    取消订单
+                </button>
+                <button th:if="${booking.status == 'COMPLETED'}" class="btn-action btn-success" th:onclick="'goToReview(' + ${booking.id} + ',' + ${booking.hotelId} + ')'">
+                    <i class="bi bi-star"></i>
+                    发表评价
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

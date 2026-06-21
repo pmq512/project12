@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>营业执照审核 - Luxury Stay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .font-serif {
+            font-family: 'Playfair Display', 'Noto Serif SC', Georgia, serif;
+        }
+        .font-sans {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content" class="font-sans">
+            <div class="alert alert-info" th:if="${unverifiedCount > 0}">
+                <i class="bi bi-info-circle"></i>
+                <strong>待审核:</strong> 有 <span th:text="${unverifiedCount}"></span> 个商家营业执照等待审核认证
+            </div>
+
+            <div class="stats-grid mb-4">
+                <div class="stat-card orange">
+                    <div class="stat-header">
+                        <span class="stat-label">待审核</span>
+                        <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+                    </div>
+                    <div class="stat-value" th:text="${unverifiedCount}">0</div>
+                    <div class="stat-change negative" th:if="${unverifiedCount > 0}">
+                        <i class="bi bi-clock"></i>
+                        需要处理
+                    </div>
+                    <div class="stat-change positive" th:unless="${unverifiedCount > 0}">
+                        <i class="bi bi-check-circle"></i>
+                        全部已处理
+                    </div>
+                </div>
+
+                <div class="stat-card green">
+                    <div class="stat-header">
+                        <span class="stat-label">已通过</span>
+                        <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                    </div>
+                    <div class="stat-value" th:text="${businesses.size() - unverifiedCount}">0</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-shield-check"></i>
+                        已认证商家
+                    </div>
+                </div>
+
+                <div class="stat-card blue">
+                    <div class="stat-header">
+                        <span class="stat-label">商家总数</span>
+                        <div class="stat-icon blue"><i class="bi bi-building"></i></div>
+                    </div>
+                    <div class="stat-value" th:text="${businesses.size()}">0</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-trending-up"></i>
+                        全部商家
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="data-table-header">
+                    <h5><i class="bi bi-file-earmark-text"></i>营业执照审核</h5>
+                    <div class="table-actions">
+                        <div class="search-filter">
+                            <select onchange="filterLicenses(this.value)">
+                                <option value="">全部状态</option>
+                                <option value="unverified">待审核</option>
+                                <option value="verified">已通过</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <table class="table" id="licenseTable">
+                    <thead>
+                        <tr>
+                            <th>商家ID</th>
+                            <th>商家名称</th>
+                            <th>联系人</th>
+                            <th>手机号</th>
+                            <th>营业执照</th>
+                            <th>认证状态</th>
+                            <th>注册时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="business : ${businesses}" 
+                            th:attr="data-status=${business.businessLicenseVerified ? 'verified' : 'unverified'}">
+                            <td>#<span th:text="${business.id}"></span></td>
+                            <td>
+                                <span th:text="${business.username}"></span>
+                            </td>
+                            <td th:text="${business.contactName} ?: '-'"></td>
+                            <td th:text="${business.phone} ?: '-'"></td>
+                            <td>
+                                <span th:if="${business.businessLicense != null}" class="text-success">
+                                    <i class="bi bi-file-earmark-check"></i> 已上传
+                                </span>
+                                <span th:unless="${business.businessLicense != null}" class="text-danger">
+                                    <i class="bi bi-file-earmark-x"></i> 未上传
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:class="${business.businessLicenseVerified ? 'status-resolved' : 'status-pending'}">
+                                    <span th:text="${business.businessLicenseVerified ? '已认证' : '待认证'}"></span>
+                                </span>
+                            </td>
+                            <td th:text="${business.createdAt}"></td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button th:if="${!business.businessLicenseVerified}" 
+                                            class="btn-action btn-success" 
+                                            style="padding: 6px 12px; font-size: 0.8rem;"
+                                            onclick="verifyLicense([[${business.id}]], true)">
+                                        <i class="bi bi-check-circle"></i>通过
+                                    </button>
+                                    <button th:if="${!business.businessLicenseVerified}" 
+                                            class="btn-action btn-danger" 
+                                            style="padding: 6px 12px; font-size: 0.8rem;"
+                                            onclick="verifyLicense([[${business.id}]], false)">
+                                        <i class="bi bi-x-circle"></i>驳回
+                                    </button>
+                                    <span th:if="${business.businessLicenseVerified}" class="text-success" style="font-size: 0.85rem;">
+                                        <i class="bi bi-shield-check"></i> 已认证
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${businesses.isEmpty()}">
+                            <td colspan="8" class="empty-state">
+                                <i class="bi bi-building"></i>
+                                <h5>暂无商家</h5>
+                                <p>系统中还没有商家数据</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal fade" id="verifyModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-shield-check"></i>营业执照认证</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="verifyContent"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-action btn-outline" data-bs-dismiss="modal">取消</button>
+                            <a id="verifyLink" href="#" class="btn-action btn-success">
+                                <i class="bi bi-check-circle"></i>确认认证
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        function filterLicenses(status) {
+            const rows = document.querySelectorAll('#licenseTable tbody tr[data-status]');
+            rows.forEach(row => {
+                if (!status || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function verifyLicense(id, verified) {
+            const action = verified ? 'verify' : 'reject';
+            const content = verified 
+                ? '<p class="text-success"><i class="bi bi-check-circle-fill"></i> 确定要通过该商家的营业执照认证吗？</p><p class="text-muted small">通过后商家将获得正式经营资格</p>'
+                : '<p class="text-danger"><i class="bi bi-x-circle-fill"></i> 确定要驳回该商家的营业执照认证吗？</p><p class="text-muted small">驳回后商家将需要重新提交营业执照</p>';
+            
+            document.getElementById('verifyContent').innerHTML = content;
+            document.getElementById('verifyLink').href = '/admin/licenses/' + id + '/verify?verified=' + verified;
+            document.getElementById('verifyLink').className = verified ? 'btn-action btn-success' : 'btn-action btn-danger';
+            document.getElementById('verifyLink').innerHTML = verified 
+                ? '<i class="bi bi-check-circle"></i>确认通过' 
+                : '<i class="bi bi-x-circle"></i>确认驳回';
+            
+            const modal = new bootstrap.Modal(document.getElementById('verifyModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

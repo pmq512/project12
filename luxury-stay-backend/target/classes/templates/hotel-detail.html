@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${hotel.name} + ' - LuxuryStay'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a0a12;
+            --primary-light: #12121f;
+            --primary-dark: #050508;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --secondary-light: #e5c158;
+            --accent-color: #7c3aed;
+            --accent-light: #8b5cf6;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --text-white: #ffffff;
+            --text-gray: #374151;
+            --text-light: #6b7280;
+            --text-muted: #9ca3af;
+            --bg-dark: #0a0a12;
+            --bg-light: #fafafa;
+            --bg-card: #ffffff;
+            --bg-gradient-start: #0a0a12;
+            --bg-gradient-mid: #12121f;
+            --bg-gradient-end: #1a1a2e;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-dark: rgba(255, 255, 255, 0.08);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.18);
+            --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.22);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 400;
+            line-height: 1.7;
+            color: #1f2937;
+            background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', 'Inter', Georgia, serif;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--primary-color);
+            letter-spacing: -0.02em;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 18, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.25rem !important;
+            margin: 0 0.2rem;
+            border-radius: 12px;
+            transition: var(--transition-normal);
+            position: relative;
+        }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--secondary-color);
+            transition: width var(--transition-normal);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link:hover::after {
+            width: 50%;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 14px 40px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 8px 28px rgba(212, 175, 55, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left var(--transition-slow);
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--secondary-dark) 0%, var(--secondary-color) 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(212, 175, 55, 0.5);
+            color: var(--text-white);
+        }
+
+        .btn-secondary-custom {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-white);
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transition-normal);
+        }
+
+        .btn-secondary-custom:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .hero-image-section {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero-image-section:hover .hero-image {
+            transform: scale(1.05);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(10, 10, 18, 0.2) 0%, rgba(10, 10, 18, 0.6) 40%, rgba(10, 10, 18, 0.92) 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 90px;
+        }
+
+        .hero-content {
+            color: var(--text-white);
+            max-width: 950px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-rating {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .star-badge {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .star-badge i {
+            font-size: 1rem;
+        }
+
+        .rating-value {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .rating-value i {
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+            text-shadow: 0 2px 8px rgba(212, 175, 55, 0.5);
+        }
+
+        .rating-reviews {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 1rem;
+            margin-left: 10px;
+            font-weight: 400;
+        }
+
+        .hero-title {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 4.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-location {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .hero-location i {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .hotel-section {
+            padding: 100px 0;
+            background: var(--bg-card);
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: var(--transition-normal);
+        }
+
+        .section-card:hover {
+            box-shadow: var(--shadow-xl);
+        }
+
+        .section-title {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 32px;
+            letter-spacing: -0.02em;
+            position: relative;
+            padding-bottom: 16px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            border-radius: 2px;
+        }
+
+        .facility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+        }
+
+        .facility-tag {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+            color: var(--secondary-color);
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-size: 0.925rem;
+            font-weight: 500;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .facility-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left var(--transition-slow);
+        }
+
+        .facility-tag i {
+            font-size: 0.95rem;
+        }
+
+        .facility-tag:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(212, 175, 55, 0.4);
+            border-color: transparent;
+        }
+
+        .facility-tag:hover::before {
+            left: 100%;
+        }
+
+        .booking-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            box-shadow: var(--shadow-2xl);
+            padding: 50px;
+            position: sticky;
+            top: 110px;
+            border: 1px solid var(--border-light);
+            background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+        }
+
+        .price-section {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .price-amount {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            font-family: 'Inter', 'Arial Black', sans-serif;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .price-label {
+            color: var(--text-light);
+            font-size: 1.15rem;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        .availability {
+            color: var(--success-color);
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .availability i {
+            font-size: 1.1rem;
+        }
+
+        .booking-form .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .booking-form .form-label i {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        .booking-form .form-control,
+        .booking-form .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px 22px;
+            font-size: 1rem;
+            transition: var(--transition-normal);
+            background: var(--bg-light);
+            font-family: inherit;
+        }
+
+        .booking-form .form-control:focus,
+        .booking-form .form-select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.15);
+            background: var(--bg-card);
+            transform: translateY(-2px);
+        }
+
+        .booking-guarantee {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            transition: var(--transition-normal);
+        }
+
+        .booking-guarantee:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .guarantee-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--success-color) 0%, #16a34a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
+        }
+
+        .guarantee-text {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            line-height: 1.7;
+        }
+
+        .guarantee-text strong {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .description-section {
+            line-height: 1.9;
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            letter-spacing: 0.01em;
+            text-align: justify;
+        }
+
+        .highlight-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 28px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: var(--transition-normal);
+        }
+
+        .highlight-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .highlight-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .highlight-title i {
+            font-size: 1.1rem;
+        }
+
+        .highlight-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .highlight-list li {
+            padding: 10px 15px;
+            color: var(--text-gray);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .highlight-list li:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
+
+        .highlight-list li::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #050508 100%);
+            padding: 90px 0 55px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: 50px;
+        }
+
+        .footer-brand {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 40px;
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.925rem;
+        }
+
+        .rooms-section {
+            background: linear-gradient(180deg, var(--bg-light) 0%, #f5f5f5 100%);
+            padding: 100px 0;
+        }
+
+        .room-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            transition: var(--transition-normal);
+            position: relative;
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--secondary-dark) 50%, var(--secondary-color) 100%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .room-card:hover::before {
+            opacity: 1;
+        }
+
+        .room-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .room-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            transition: var(--transition-slow);
+        }
+
+        .room-card:hover .room-image {
+            transform: scale(1.08);
+        }
+
+        .room-content {
+            padding: 32px;
+        }
+
+        .room-name {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 14px;
+        }
+
+        .room-specs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .room-spec {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 8px 14px;
+            border-radius: 10px;
+        }
+
+        .room-spec i {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        .room-desc {
+            color: var(--text-gray);
+            font-size: 1rem;
+            line-height: 1.75;
+            margin-bottom: 24px;
+        }
+
+        .room-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .room-feature {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            color: var(--secondary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            transition: var(--transition-fast);
+        }
+
+        .room-feature:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .room-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .room-price-amount {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .room-price-label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+
+        .reviews-section {
+            background: var(--bg-card);
+            padding: 100px 0;
+        }
+
+        .review-card {
+            background: var(--bg-light);
+            border-radius: 24px;
+            padding: 36px;
+            border: 1px solid var(--border-light);
+            transition: var(--transition-normal);
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .review-card::before {
+            content: '"';
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 5rem;
+            font-family: 'Noto Serif SC', Georgia, serif;
+            color: rgba(212, 175, 55, 0.06);
+            line-height: 1;
+        }
+
+        .review-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.15);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .reviewer-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-white);
+            font-size: 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.35);
+            transition: var(--transition-fast);
+        }
+
+        .review-card:hover .reviewer-avatar {
+            transform: scale(1.08);
+        }
+
+        .reviewer-name {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .review-date {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .review-rating i {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            text-shadow: 0 1px 4px rgba(212, 175, 55, 0.4);
+        }
+
+        .review-title {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.35rem;
+            margin-bottom: 16px;
+        }
+
+        .review-content {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            position: relative;
+            z-index: 1;
+        }
+
+        .review-reply {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 18px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .review-reply-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .reply-badge {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .review-reply-content {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.65;
+        }
+
+        .review-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 35px;
+        }
+
+        .review-stat-item {
+            text-align: center;
+        }
+
+        .review-stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .review-stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .review-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        /* 评价表单样式 */
+        .review-form-container {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .review-form-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .review-form-title i {
+            font-size: 1.1rem;
+        }
+
+        .rating-input-group {
+            margin-bottom: 20px;
+        }
+
+        .rating-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .star-rating-input {
+            display: flex;
+            gap: 8px;
+            font-size: 1.8rem;
+        }
+
+        .star-input {
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star-input:hover,
+        .star-input.active {
+            color: var(--secondary-color);
+            transform: scale(1.15);
+        }
+
+        .form-label-custom {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-textarea-custom {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+            background: var(--bg-card);
+        }
+
+        .form-textarea-custom:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+        }
+
+        .btn-submit-review {
+            width: 100%;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-submit-review:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+        }
+
+        /* 未登录提示样式 */
+        .review-login-prompt {
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.08) 0%, rgba(107, 114, 128, 0.03) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(107, 114, 128, 0.15);
+        }
+
+        .review-login-prompt i {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+
+        .review-login-prompt p {
+            font-size: 1rem;
+            color: var(--text-gray);
+            margin-bottom: 15px;
+        }
+
+        .btn-login-review {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-login-review:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+            color: white;
+        }
+
+        /* 无评价样式 */
+        .no-reviews {
+            text-align: center;
+            padding: 60px 30px;
+            background: var(--bg-light);
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .no-reviews i {
+            font-size: 3rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .no-reviews p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+        }
+
+        .review-tab {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 1px solid transparent;
+        }
+
+        .review-tab.active {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(233, 69, 96, 0.35);
+        }
+
+        .review-tab:not(.active) {
+            background: var(--bg-light);
+            color: var(--text-gray);
+        }
+
+        .review-tab:not(.active):hover {
+            background: rgba(233, 69, 96, 0.08);
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .hero-image-section {
+                height: 400px;
+            }
+
+            .hero-overlay {
+                padding: 50px 25px;
+            }
+
+            .hero-title {
+                font-size: 2.25rem;
+            }
+
+            .price-amount {
+                font-size: 2.5rem;
+            }
+
+            .booking-card {
+                padding: 30px;
+            }
+
+            .hero-rating {
+                gap: 12px;
+            }
+        }
+
+        /* 日期选择器样式 */
+        .date-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .date-picker-native {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: white;
+            color: #2d2d44;
+            cursor: pointer;
+        }
+
+        .date-picker-native::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .date-picker-native:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(233, 69, 96, 0.15);
+        }
+
+        .date-placeholder {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 0.875rem;
+            pointer-events: none;
+            background: white;
+            padding: 0 4px;
+        }
+
+        .date-picker-native:not(:placeholder-shown) + .date-placeholder,
+        .date-picker-native:focus + .date-placeholder {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">LuxuryStay</a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/destinations">目的地</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/hotels">酒店</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/auth/login">登录</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="btn btn-primary-custom" href="/auth/register">注册</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/profile">
+                            <i class="fa-solid fa-user"></i>
+                            <span sec:authentication="name"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('BUSINESS')">
+                        <a class="btn btn-primary-custom" href="/business">商家后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="btn btn-primary-custom" href="/admin">管理后台</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="btn btn-primary-custom" href="/user">用户中心</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form action="/auth/logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light">退出登录</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-image-section">
+        <img th:src="${hotel.image}" th:alt="${hotel.name}" class="hero-image">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <div class="hero-rating">
+                    <span class="star-badge"><span th:text="${hotel.star}"></span>星级酒店</span>
+                    <span class="rating-value">
+                        <span th:text="${hotel.rating}"></span>
+                        <i class="fa-solid fa-star"></i>
+                        <span class="rating-reviews">(128条评价)</span>
+                    </span>
+                </div>
+                <h1 class="hero-title" th:text="${hotel.name}"></h1>
+                <div class="hero-location">
+                    <i class="fa-solid fa-map-marker"></i>
+                    <span th:text="${hotel.location}"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hotel-section">
+        <div class="container">
+            <div class="row g-9">
+                <div class="col-lg-8">
+                    <div class="section-card p-8">
+                        <h2 class="section-title">酒店介绍</h2>
+                        <p class="description-section" th:text="${hotel.description}"></p>
+                        
+                        <div class="highlight-card">
+                            <div class="highlight-title">
+                                <i class="fa-solid fa-award"></i>
+                                酒店特色
+                            </div>
+                            <ul class="highlight-list">
+                                <li>紧邻城市核心商圈，交通便利</li>
+                                <li>24小时管家式服务</li>
+                                <li>室内恒温泳池与高端SPA</li>
+                                <li>米其林星级主厨定制餐食</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="section-card p-8 mt-7">
+                        <h2 class="section-title">设施服务</h2>
+                        <div class="facility-grid">
+                            <span class="facility-tag" th:each="facility : ${#strings.arraySplit(hotel.facilities, ',')}" 
+                                  th:text="${facility}">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="booking-card">
+                        <div class="price-section">
+                            <div>
+                                <span class="price-amount">¥<span th:text="${hotel.price}"></span></span>
+                                <span class="price-label">/晚起</span>
+                            </div>
+                            <div class="availability">
+                                <i class="fa-solid fa-check-circle"></i>
+                                <span>可用房间：<strong><span th:text="${hotel.roomsAvailable}"></span></strong> 间</span>
+                            </div>
+                        </div>
+
+                        <form th:action="@{/booking/confirm}" method="get" class="booking-form" onsubmit="calculateGuests()">
+                            <input type="hidden" name="hotelId" th:value="${hotel.id}">
+                            <input type="hidden" name="guests" id="guestsInput">
+
+                            <div class="mb-5">
+                                <label class="form-label"><i class="fa-solid fa-calendar-check"></i>入住日期</label>
+                                <div class="date-input-wrapper">
+                                    <input type="date" name="checkIn" class="form-control date-picker-native" min="" required>
+                                    <span class="date-placeholder">选择入住日期</span>
+                                </div>
+                            </div>
+                            <div class="mb-5">
+                                <label class="form-label"><i class="fa-solid fa-calendar-xmark"></i>退房日期</label>
+                                <div class="date-input-wrapper">
+                                    <input type="date" name="checkOut" class="form-control date-picker-native" min="" required>
+                                    <span class="date-placeholder">选择退房日期</span>
+                                </div>
+                            </div>
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fa-solid fa-users"></i>成人</label>
+                                    <select name="adults" class="form-select">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fa-solid fa-child"></i>儿童</label>
+                                    <select name="children" class="form-select">
+                                        <option>0</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <label class="form-label"><i class="fa-solid fa-bed"></i>房型</label>
+                                <select name="roomType" class="form-select">
+                                    <option>豪华大床房</option>
+                                    <option>豪华双床房</option>
+                                    <option>行政套房</option>
+                                    <option>家庭套房</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-full mb-3">立即预订</button>
+                            <button type="button" id="wishlistBtn" class="btn btn-outline-custom w-full" onclick="toggleWishlist()">
+                                <i class="fa-solid fa-heart" id="wishlistIcon"></i>
+                                <span id="wishlistText">收藏酒店</span>
+                            </button>
+                        </form>
+
+                        <div class="booking-guarantee">
+                            <div class="guarantee-icon">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </div>
+                            <div class="guarantee-text">
+                                <strong>安全保障</strong><br>
+                                安全支付 · 免费取消 · 24小时客服
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="rooms-section py-16">
+        <div class="container">
+            <div class="section-header text-center mb-14">
+                <h2 class="section-title text-2xl">精选房型</h2>
+                <p class="section-subtitle text-text-light mt-4">为您精心挑选的舒适住宿选择</p>
+            </div>
+            
+            <div class="row g-6">
+                <div class="col-lg-6">
+                    <div class="room-card">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20deluxe%20king%20bed%20room%20modern%20elegant%20interior%20design&image_size=landscape_4_3" alt="豪华大床房" class="room-image">
+                        <div class="room-content">
+                            <h3 class="room-name">豪华大床房</h3>
+                            <div class="room-specs">
+                                <span class="room-spec"><i class="fa-solid fa-maximize"></i> 45㎡</span>
+                                <span class="room-spec"><i class="fa-solid fa-bed"></i> 特大床</span>
+                                <span class="room-spec"><i class="fa-solid fa-users"></i> 2人</span>
+                            </div>
+                            <p class="room-desc">宽敞明亮的空间，配备舒适大床和现代设施，为您提供温馨的入住体验。</p>
+                            <div class="room-features">
+                                <span class="room-feature">免费WiFi</span>
+                                <span class="room-feature">浴缸</span>
+                                <span class="room-feature">迷你吧</span>
+                            </div>
+                            <div class="room-price">
+                                <div>
+                                    <span class="room-price-amount">¥<span th:text="${hotel.price}"></span></span>
+                                    <span class="room-price-label">/晚起</span>
+                                </div>
+                                <button class="btn btn-secondary-custom">选择房型</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="room-card">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20twin%20bed%20room%20modern%20elegant%20interior%20design&image_size=landscape_4_3" alt="豪华双床房" class="room-image">
+                        <div class="room-content">
+                            <h3 class="room-name">豪华双床房</h3>
+                            <div class="room-specs">
+                                <span class="room-spec"><i class="fa-solid fa-maximize"></i> 42㎡</span>
+                                <span class="room-spec"><i class="fa-solid fa-bed"></i> 双床</span>
+                                <span class="room-spec"><i class="fa-solid fa-users"></i> 2人</span>
+                            </div>
+                            <p class="room-desc">两张舒适单人床，适合结伴出行的朋友或商务旅客。</p>
+                            <div class="room-features">
+                                <span class="room-feature">免费WiFi</span>
+                                <span class="room-feature">淋浴</span>
+                                <span class="room-feature">办公桌</span>
+                            </div>
+                            <div class="room-price">
+                                <div>
+                                    <span class="room-price-amount">¥<span th:text="${hotel.price}"></span></span>
+                                    <span class="room-price-label">/晚起</span>
+                                </div>
+                                <button class="btn btn-secondary-custom">选择房型</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="room-card">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20executive%20suite%20premium%20interior%20design%20living%20area&image_size=landscape_4_3" alt="行政套房" class="room-image">
+                        <div class="room-content">
+                            <h3 class="room-name">行政套房</h3>
+                            <div class="room-specs">
+                                <span class="room-spec"><i class="fa-solid fa-maximize"></i> 85㎡</span>
+                                <span class="room-spec"><i class="fa-solid fa-bed"></i> 特大床</span>
+                                <span class="room-spec"><i class="fa-solid fa-users"></i> 3人</span>
+                            </div>
+                            <p class="room-desc">独立客厅与卧室，尊享行政礼遇，为您的商务出行提供完美体验。</p>
+                            <div class="room-features">
+                                <span class="room-feature">免费WiFi</span>
+                                <span class="room-feature">浴缸</span>
+                                <span class="room-feature">行政酒廊</span>
+                                <span class="room-feature">管家服务</span>
+                            </div>
+                            <div class="room-price">
+                                <div>
+                                    <span class="room-price-amount">¥<span th:text="${hotel.price * 1.8}"></span></span>
+                                    <span class="room-price-label">/晚起</span>
+                                </div>
+                                <button class="btn btn-secondary-custom">选择房型</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="room-card">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=luxury%20hotel%20family%20suite%20spacious%20interior%20design%20kids%20friendly&image_size=landscape_4_3" alt="家庭套房" class="room-image">
+                        <div class="room-content">
+                            <h3 class="room-name">家庭套房</h3>
+                            <div class="room-specs">
+                                <span class="room-spec"><i class="fa-solid fa-maximize"></i> 120㎡</span>
+                                <span class="room-spec"><i class="fa-solid fa-bed"></i> 大床+双床</span>
+                                <span class="room-spec"><i class="fa-solid fa-users"></i> 4人</span>
+                            </div>
+                            <p class="room-desc">宽敞的家庭空间，配备儿童设施，让全家人享受温馨的度假时光。</p>
+                            <div class="room-features">
+                                <span class="room-feature">免费WiFi</span>
+                                <span class="room-feature">浴缸</span>
+                                <span class="room-feature">儿童设施</span>
+                                <span class="room-feature">阳台</span>
+                            </div>
+                            <div class="room-price">
+                                <div>
+                                    <span class="room-price-amount">¥<span th:text="${hotel.price * 2.5}"></span></span>
+                                    <span class="room-price-label">/晚起</span>
+                                </div>
+                                <button class="btn btn-secondary-custom">选择房型</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reviews-section py-16">
+        <div class="container">
+            <div class="section-header text-center mb-14">
+                <h2 class="section-title text-2xl">宾客评价</h2>
+                <p class="section-subtitle text-text-light mt-4">来自真实住客的声音</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="review-stats">
+                        <div class="review-stat-item">
+                            <div class="review-stat-value" th:text="${avgRating}">4.8</div>
+                            <div class="review-stat-label">综合评分</div>
+                        </div>
+                        <div class="review-stat-item">
+                            <div class="review-stat-value" th:text="${reviewCount}">128</div>
+                            <div class="review-stat-label">评价数量</div>
+                        </div>
+                        <div class="review-stat-item">
+                            <div class="review-stat-value">98%</div>
+                            <div class="review-stat-label">推荐率</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 评价表单 - 登录用户可见 -->
+                    <div class="review-form-container" sec:authorize="isAuthenticated()">
+                        <h4 class="review-form-title">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            发表评价
+                        </h4>
+                        <form id="reviewForm" class="review-form">
+                            <div class="rating-input-group">
+                                <label class="rating-label">您的评分</label>
+                                <div class="star-rating-input">
+                                    <i class="fa-regular fa-star star-input" data-rating="1"></i>
+                                    <i class="fa-regular fa-star star-input" data-rating="2"></i>
+                                    <i class="fa-regular fa-star star-input" data-rating="3"></i>
+                                    <i class="fa-regular fa-star star-input" data-rating="4"></i>
+                                    <i class="fa-regular fa-star star-input" data-rating="5"></i>
+                                </div>
+                                <input type="hidden" id="selectedRating" name="rating" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-custom">评价内容</label>
+                                <textarea id="reviewContent" name="content" class="form-textarea-custom" 
+                                    placeholder="分享您的入住体验..." rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit-review">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                提交评价
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- 未登录提示 -->
+                    <div class="review-login-prompt" sec:authorize="!isAuthenticated()">
+                        <i class="fa-solid fa-user-lock"></i>
+                        <p>登录后即可发表评价</p>
+                        <a th:href="@{/auth/login}" class="btn-login-review">立即登录</a>
+                    </div>
+                    
+                    <div class="review-tabs">
+                        <span class="review-tab active" onclick="filterReviews('all')">全部</span>
+                        <span class="review-tab" onclick="filterReviews('excellent')">好评</span>
+                        <span class="review-tab" onclick="filterReviews('medium')">中评</span>
+                        <span class="review-tab" onclick="filterReviews('poor')">差评</span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8">
+                    <!-- 动态评价列表 -->
+                    <div th:if="${reviews != null and !reviews.empty}">
+                        <div class="review-card" th:each="review : ${reviews}" th:attr="data-rating=${review.rating}">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-avatar" th:text="${review.userName.charAt(0)}">张</div>
+                                    <div>
+                                        <div class="reviewer-name" th:text="${review.userName}">张先生</div>
+                                        <div class="review-date" th:text="${#temporals.format(review.createdAt, 'yyyy年M月d日')}">2026年6月10日</div>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    <i class="fa-solid fa-star" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                                    <i class="fa-regular fa-star" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" th:if="${review.rating < 5}"></i>
+                                </div>
+                            </div>
+                            <h4 class="review-title" th:text="${review.title != null ? review.title : '评价'}">评价标题</h4>
+                            <p class="review-content" th:text="${review.content}">评价内容</p>
+                            <div class="review-reply" th:if="${review.businessReply != null and !review.businessReply.isEmpty()}">
+                                <div class="review-reply-header">
+                                    <span class="reply-badge">商家回复</span>
+                                    <span class="review-date" th:text="${review.replyAt != null ? #temporals.format(review.replyAt, 'yyyy年M月d日') : ''}">2026年6月11日</span>
+                                </div>
+                                <p class="review-reply-content" th:text="${review.businessReply}">商家回复内容</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 无评价时显示 -->
+                    <div th:if="${reviews == null or reviews.empty}" class="no-reviews">
+                        <i class="fa-solid fa-comments"></i>
+                        <p>暂无评价，成为第一个评价者吧！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">LuxuryStay</div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 LuxuryStay. All rights reserved. | 京ICP备12345678号</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function calculateGuests() {
+            const adults = parseInt(document.querySelector('select[name="adults"]').value) || 1;
+            const children = parseInt(document.querySelector('select[name="children"]').value) || 0;
+            document.getElementById('guestsInput').value = adults + children;
+            return true;
+        }
+
+        // 星级评分交互
+        const stars = document.querySelectorAll('.star-input');
+        let selectedRating = 5;
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                document.getElementById('selectedRating').value = selectedRating;
+                updateStars();
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.dataset.rating);
+                highlightStars(rating);
+            });
+        });
+        
+        document.querySelector('.star-rating-input')?.addEventListener('mouseleave', function() {
+            updateStars();
+        });
+        
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.classList.remove('fa-regular');
+                    star.classList.add('fa-solid');
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('fa-solid');
+                    star.classList.add('fa-regular');
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        function updateStars() {
+            highlightStars(selectedRating);
+        }
+        
+        // 初始化星级显示
+        updateStars();
+        
+        // 评价表单提交
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const hotelId = /*[[${hotel.id}]]*/ 1;
+                const rating = document.getElementById('selectedRating').value;
+                const content = document.getElementById('reviewContent').value;
+                
+                if (!content.trim()) {
+                    alert('请输入评价内容');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-Id': localStorage.getItem('userId') || '1'
+                        },
+                        body: JSON.stringify({
+                            hotelId: hotelId,
+                            rating: parseInt(rating),
+                            content: content
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('评价提交成功，等待审核');
+                        reviewForm.reset();
+                        selectedRating = 5;
+                        updateStars();
+                        // 刷新页面显示新评价
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        alert(result.message || '评价提交失败，请稍后重试');
+                    }
+                } catch (error) {
+                    console.error('提交评价失败:', error);
+                    alert('网络错误，请稍后重试');
+                }
+            });
+        }
+        
+        function filterReviews(type) {
+            const tabs = document.querySelectorAll('.review-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const cards = document.querySelectorAll('.review-card');
+            cards.forEach(card => {
+                const rating = parseInt(card.dataset.rating);
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else if (type === 'excellent') {
+                    card.style.display = rating === 5 ? 'block' : 'none';
+                } else if (type === 'medium') {
+                    card.style.display = rating >= 3 && rating < 5 ? 'block' : 'none';
+                } else if (type === 'poor') {
+                    card.style.display = rating <= 2 ? 'block' : 'none';
+                }
+            });
+        }
+
+        // 收藏功能
+        const hotelId = /*[[${hotel.id}]]*/ 1;
+        let isWishlisted = false;
+
+        // 页面加载时检查收藏状态
+        async function checkWishlistStatus() {
+            try {
+                const response = await fetch(`/user/wishlist/check/${hotelId}`);
+                const result = await response.json();
+                isWishlisted = result.wishlisted;
+                updateWishlistButton();
+            } catch (error) {
+                console.error('检查收藏状态失败:', error);
+            }
+        }
+
+        // 更新收藏按钮状态
+        function updateWishlistButton() {
+            const btn = document.getElementById('wishlistBtn');
+            const icon = document.getElementById('wishlistIcon');
+            const text = document.getElementById('wishlistText');
+            
+            if (isWishlisted) {
+                btn.classList.remove('btn-outline-custom');
+                btn.classList.add('btn-danger-custom');
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+                text.textContent = '已收藏';
+            } else {
+                btn.classList.remove('btn-danger-custom');
+                btn.classList.add('btn-outline-custom');
+                icon.classList.remove('fa-solid');
+                icon.classList.add('fa-regular');
+                text.textContent = '收藏酒店';
+            }
+        }
+
+        // 切换收藏状态
+        async function toggleWishlist() {
+            if (isWishlisted) {
+                // 取消收藏
+                try {
+                    const response = await fetch(`/user/wishlist/remove/${hotelId}`);
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
+                    }
+                    isWishlisted = false;
+                    updateWishlistButton();
+                } catch (error) {
+                    console.error('取消收藏失败:', error);
+                    alert('操作失败，请稍后重试');
+                }
+            } else {
+                // 添加收藏
+                try {
+                    const response = await fetch(`/user/wishlist/add/${hotelId}`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        isWishlisted = true;
+                        updateWishlistButton();
+                        alert(result.message);
+                    } else {
+                        alert(result.message);
+                        if (result.message === '请先登录') {
+                            window.location.href = '/auth/login';
+                        }
+                    }
+                } catch (error) {
+                    console.error('收藏失败:', error);
+                    alert('操作失败，请稍后重试');
+                }
+            }
+        }
+
+        // 页面加载时检查收藏状态
+        document.addEventListener('DOMContentLoaded', function() {
+            checkWishlistStatus();
+        });
+    </script>
+</body>
+</html>

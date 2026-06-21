@@ -1,0 +1,78 @@
+<div th:fragment="content" class="font-sans">
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-users"></i>用户列表</h5>
+            <div class="table-actions">
+                <div class="search-filter">
+                    <select onchange="this.form.submit()">
+                        <option value="" th:selected="${selectedType == null || selectedType == ''}">全部用户</option>
+                        <option value="USER" th:selected="${selectedType == 'USER'}">普通用户</option>
+                        <option value="BUSINESS" th:selected="${selectedType == 'BUSINESS'}">商家用户</option>
+                    </select>
+                    <input type="hidden" name="type" th:value="${selectedType}" />
+                </div>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>用户ID</th>
+                    <th>用户名</th>
+                    <th>邮箱</th>
+                    <th>手机号</th>
+                    <th>用户类型</th>
+                    <th>状态</th>
+                    <th>注册时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td>#<span th:text="${user.id}"></span></td>
+                    <td>
+                        <a th:href="@{/admin/users/{id}(id=${user.id})}" class="text-primary font-semibold" style="text-decoration: none;">
+                            <span th:text="${user.name}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${user.email} ?: '-'"></td>
+                    <td th:text="${user.phone} ?: '-'"></td>
+                    <td>
+                        <span class="status-badge" th:class="${user.userType == 'BUSINESS' ? 'status-processing' : 'status-resolved'}">
+                            <span th:text="${user.userType == 'BUSINESS' ? '商家' : '普通用户'}"></span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" th:class="${user.enabled ? 'status-resolved' : 'status-rejected'}">
+                            <span th:text="${user.enabled ? '正常' : '禁用'}"></span>
+                        </span>
+                    </td>
+                    <td th:text="${user.createdAt}"></td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/admin/users/{id}(id=${user.id})}" class="btn-action btn-info" style="padding: 6px 12px; font-size: 0.8rem;">
+                                <i class="bi bi-eye"></i>查看
+                            </a>
+                            <a th:if="${user.enabled}" 
+                               th:href="@{/admin/users/{id}/disable(id=${user.id})}" 
+                               class="btn-action btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
+                                <i class="bi bi-ban"></i>禁用
+                            </a>
+                            <a th:unless="${user.enabled}" 
+                               th:href="@{/admin/users/{id}/enable(id=${user.id})}" 
+                               class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;">
+                                <i class="bi bi-check-circle"></i>启用
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${users.isEmpty()}">
+                    <td colspan="8" class="empty-state">
+                        <i class="bi bi-users"></i>
+                        <h5>暂无用户</h5>
+                        <p>系统中还没有用户数据</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

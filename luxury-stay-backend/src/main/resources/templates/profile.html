@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - LuxuryStay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f1a;
+            --primary-light: #1a1a2e;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --text-white: #ffffff;
+            --text-gray: #5a5a6e;
+            --text-light: #8888a0;
+            --bg-dark: #0f0f1a;
+            --bg-light: #f8f8fc;
+            --bg-card: #ffffff;
+            --border-color: #e8e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: #2d2d44;
+        }
+
+        .navbar {
+            background: var(--primary-color);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+        }
+
+        .profile-section {
+            padding: 6rem 0 4rem;
+        }
+
+        .profile-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 3rem;
+            color: var(--secondary-color);
+            border: 4px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-role {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        .profile-body {
+            padding: 2.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            border: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .alert {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+            color: #166534;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #991b1b;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            color: var(--text-gray);
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .info-value {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">LuxuryStay</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">首页</a>
+                <a class="nav-link" href="/destinations">目的地</a>
+                <a class="nav-link" href="/hotels">酒店</a>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link active" href="/profile">
+                        <i class="fa-solid fa-user"></i>
+                        <span sec:authentication="name"></span>
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('BUSINESS')">
+                    <a class="nav-link" href="/business">商家后台</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form action="/auth/logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light">退出登录</button>
+                    </form>
+                </li>
+            </div>
+        </div>
+    </nav>
+
+    <section class="profile-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <h1 class="profile-name" th:text="${user.name}"></h1>
+                            <p class="profile-role" th:text="${user.userType == 'BUSINESS' ? '商家用户' : '普通用户'}"></p>
+                        </div>
+                        
+                        <div class="profile-body">
+                            <h2 class="h4 mb-4" style="font-family: 'Noto Serif SC', serif;">个人信息</h2>
+                            
+                            <div th:if="${success}" class="alert alert-success">
+                                <i class="fa-solid fa-check-circle"></i> [[${success}]]
+                            </div>
+                            <div th:if="${error}" class="alert alert-danger">
+                                <i class="fa-solid fa-exclamation-circle"></i> [[${error}]]
+                            </div>
+
+                            <form method="post" th:object="${user}">
+                                <input type="hidden" th:field="*{id}">
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-user"></i> 用户名
+                                    </label>
+                                    <input type="text" class="form-control" th:field="*{name}" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-envelope"></i> 邮箱
+                                    </label>
+                                    <input type="email" class="form-control" th:field="*{email}" readonly>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-phone"></i> 手机号
+                                    </label>
+                                    <input type="tel" class="form-control" th:field="*{phone}" placeholder="请输入手机号">
+                                </div>
+
+                                <div th:if="${user.userType == 'BUSINESS'}" class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-building"></i> 公司名称
+                                    </label>
+                                    <input type="text" class="form-control" th:field="*{companyName}" readonly>
+                                </div>
+
+                                <div th:if="${user.userType == 'BUSINESS'}" class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-file-text"></i> 营业执照
+                                    </label>
+                                    <input type="text" class="form-control" th:field="*{businessLicense}" readonly>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-calendar"></i> 注册时间
+                                    </label>
+                                    <input type="text" class="form-control" th:text="${user.createdAt}" readonly>
+                                </div>
+
+                                <div class="d-flex gap-3">
+                                    <button type="submit" class="btn btn-primary-custom">
+                                        <i class="fa-solid fa-save"></i> 保存修改
+                                    </button>
+                                    <a href="/" class="btn btn-outline-custom">
+                                        <i class="fa-solid fa-arrow-left"></i> 返回首页
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

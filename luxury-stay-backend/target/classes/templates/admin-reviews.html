@@ -1,0 +1,79 @@
+<div th:fragment="content" class="font-sans">
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-chat-dots me-2"></i>评论管理</h5>
+            <div class="d-flex gap-3 align-items-center">
+                <form th:action="@{/admin/reviews}" method="get" class="d-flex gap-2">
+                    <select name="status" class="form-select" style="min-width: 140px; border-radius: 12px; border: 2px solid rgba(212,175,55,0.3);">
+                        <option value="" th:selected="${selectedStatus == null || selectedStatus == ''}">全部状态</option>
+                        <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">待审核</option>
+                        <option value="APPROVED" th:selected="${selectedStatus == 'APPROVED'}">已通过</option>
+                        <option value="REJECTED" th:selected="${selectedStatus == 'REJECTED'}">已驳回</option>
+                    </select>
+                    <button type="submit" class="btn-action btn-primary">
+                        <i class="bi bi-funnel"></i> 筛选
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>评论ID</th>
+                        <th>用户</th>
+                        <th>酒店</th>
+                        <th>评分</th>
+                        <th>内容</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="review : ${reviews}">
+                        <td>#<span th:text="${review.id}"></span></td>
+                        <td th:text="${review.userName}"></td>
+                        <td th:text="${review.hotelName}"></td>
+                        <td>
+                            <div class="flex items-center gap-1">
+                                <i class="bi bi-star-fill text-warning" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                                <i class="bi bi-star text-gray-300" th:each="i : ${#numbers.sequence(1, 5 - review.rating)}"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="text-sm text-gray-600 line-clamp-2" th:text="${review.content}"></p>
+                        </td>
+                        <td>
+                            <span th:if="${review.status == 'PENDING'}" class="status-badge status-processing">待审核</span>
+                            <span th:if="${review.status == 'APPROVED'}" class="status-badge status-resolved">已通过</span>
+                            <span th:if="${review.status == 'REJECTED'}" class="status-badge status-rejected">已驳回</span>
+                        </td>
+                        <td th:text="${review.createdAt}"></td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:if="${review.status == 'PENDING'}" 
+                                   th:href="@{/admin/reviews/{id}/approve(id=${review.id})}" 
+                                   class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;">
+                                    <i class="bi bi-check"></i>通过
+                                </a>
+                                <a th:if="${review.status == 'PENDING'}" 
+                                   th:href="@{/admin/reviews/{id}/reject(id=${review.id})}" 
+                                   class="btn-action btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
+                                    <i class="bi bi-x"></i>驳回
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${reviews == null || reviews.isEmpty()}">
+                        <td colspan="8" class="empty-state">
+                            <i class="bi bi-chat-dots"></i>
+                            <h5>暂无评论数据</h5>
+                            <p>系统中暂无任何评论信息</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

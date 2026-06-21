@@ -1,0 +1,79 @@
+<div th:fragment="content" class="font-sans">
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-building"></i> 酒店列表</h5>
+            <div class="d-flex gap-3 align-items-center">
+                <form th:action="@{/admin/hotels}" method="get" class="d-flex gap-2">
+                    <select name="status" class="form-select" style="min-width: 140px; border-radius: 12px; border: 2px solid rgba(212,175,55,0.3);">
+                        <option value="" th:selected="${selectedStatus == null || selectedStatus == ''}">全部状态</option>
+                        <option value="ACTIVE" th:selected="${selectedStatus == 'ACTIVE'}">已上架</option>
+                        <option value="INACTIVE" th:selected="${selectedStatus == 'INACTIVE'}">已下架</option>
+                    </select>
+                    <button type="submit" class="btn-action btn-primary">
+                        <i class="bi bi-funnel"></i> 筛选
+                    </button>
+                </form>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>酒店ID</th>
+                    <th>酒店名称</th>
+                    <th>所在城市</th>
+                    <th>评分</th>
+                    <th>价格</th>
+                    <th>定金政策</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="hotel : ${hotels}">
+                    <td th:text="${hotel.id}">1</td>
+                    <td>
+                        <strong th:text="${hotel.name}">酒店名称</strong>
+                    </td>
+                    <td th:text="${hotel.location}">城市</td>
+                    <td>
+                        <span class="text-warning">
+                            <i class="bi bi-star-fill"></i>
+                            <span th:text="${hotel.rating != null ? hotel.rating : '暂无'}">4.5</span>
+                        </span>
+                    </td>
+                    <td>¥<span th:text="${hotel.price}">0</span></td>
+                    <td>
+                        <small class="text-muted" th:text="${hotel.depositPolicy != null ? hotel.depositPolicy : '未设置'}">未设置</small>
+                    </td>
+                    <td>
+                        <span class="status-badge status-confirmed" th:if="${hotel.status == 'ACTIVE'}">已上架</span>
+                        <span class="status-badge status-cancelled" th:if="${hotel.status == 'INACTIVE'}">已下架</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/admin/hotels/{id}/deactivate(id=${hotel.id})}" 
+                               class="btn-action btn-warning"
+                               th:if="${hotel.status == 'ACTIVE'}"
+                               onclick="return confirm('确定要下架该酒店吗？')">
+                                <i class="bi bi-eye-slash"></i> 下架
+                            </a>
+                            <a th:href="@{/admin/hotels/{id}/activate(id=${hotel.id})}" 
+                               class="btn-action btn-success"
+                               th:if="${hotel.status == 'INACTIVE'}"
+                               onclick="return confirm('确定要上架该酒店吗？')">
+                                <i class="bi bi-eye"></i> 上架
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${hotels == null || hotels.isEmpty()}">
+                    <td colspan="8" class="empty-state">
+                        <i class="bi bi-building"></i>
+                        <h5>暂无酒店数据</h5>
+                        <p>系统中暂无任何酒店信息</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

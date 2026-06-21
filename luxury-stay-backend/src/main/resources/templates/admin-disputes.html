@@ -1,0 +1,194 @@
+<div th:fragment="content" class="font-sans">
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+            <p class="stat-label">全部纠纷</p>
+            <div class="stat-value" th:text="${totalDisputes}">0</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+            <p class="stat-label">待处理纠纷</p>
+            <div class="stat-value" th:text="${pendingDisputes}">0</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+            <p class="stat-label">已解决纠纷</p>
+            <div class="stat-value" th:text="${resolvedDisputes}">0</div>
+        </div>
+    </div>
+    
+    <!-- 纠纷列表 -->
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5>
+                <i class="bi bi-list-ul"></i>
+                纠纷列表
+            </h5>
+            <div class="table-actions">
+                <div class="search-filter">
+                    <i class="bi bi-filter"></i>
+                    <select onchange="filterDisputes(this.value)">
+                        <option value="all">全部纠纷</option>
+                        <option value="PENDING">待处理</option>
+                        <option value="PROCESSING">处理中</option>
+                        <option value="RESOLVED">已解决</option>
+                        <option value="CLOSED">已关闭</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${disputes != null and !disputes.empty}">
+            <div style="padding: 25px;">
+                <div th:each="dispute : ${disputes}" class="dispute-item" th:attr="data-status=${dispute.status}" style="background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; border: 1px solid rgba(220, 38, 38, 0.15); transition: all 0.3s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600; color: var(--text-primary); font-size: 1rem;">
+                                <i class="bi bi-exclamation-circle" style="color: var(--admin-primary);"></i>
+                                纠纷编号：<span th:text="${dispute.id}">001</span>
+                            </h6>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 10px;">
+                                <div style="display: flex; gap: 15px; margin-bottom: 8px;">
+                                    <span><i class="bi bi-person" style="color: var(--admin-primary);"></i> 用户：<span th:text="${dispute.userName}">用户名</span></span>
+                                    <span><i class="bi bi-building" style="color: var(--admin-primary);"></i> 商家：<span th:text="${dispute.businessName}">商家名</span></span>
+                                </div>
+                                <div style="display: flex; gap: 15px;">
+                                    <span><i class="bi bi-calendar" style="color: var(--admin-primary);"></i> 订单：<span th:text="${dispute.bookingNumber}">BK001</span></span>
+                                    <span><i class="bi bi-hotel" style="color: var(--admin-primary);"></i> 酒店：<span th:text="${dispute.hotelName}">酒店名</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="status-badge" th:class="${dispute.status == 'PENDING' ? 'status-pending' : dispute.status == 'PROCESSING' ? 'status-pending' : dispute.status == 'RESOLVED' ? 'status-confirmed' : 'status-cancelled'}"
+                                  th:text="${dispute.status == 'PENDING' ? '待处理' : dispute.status == 'PROCESSING' ? '处理中' : dispute.status == 'RESOLVED' ? '已解决' : '已关闭'}">状态</span>
+                            <small style="color: var(--text-secondary); font-size: 0.85rem;" th:text="${#temporals.format(dispute.createdAt, 'yyyy-MM-dd HH:mm')}">日期</small>
+                        </div>
+                    </div>
+                    
+                    <!-- 纠纷描述 -->
+                    <div style="background: rgba(220, 38, 38, 0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <h6 style="margin: 0 0 10px 0; font-weight: 600; color: var(--admin-primary); font-size: 0.95rem;">
+                            <i class="bi bi-chat-text"></i> 纠纷描述
+                        </h6>
+                        <p style="color: #475569; line-height: 1.7; margin: 0; font-size: 0.95rem;" th:text="${dispute.reason}">纠纷原因描述</p>
+                    </div>
+                    
+                    <!-- 管理员处理记录 -->
+                    <div th:if="${dispute.adminResponse != null and !dispute.adminResponse.isEmpty()}" style="background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, rgba(220, 38, 38, 0.03) 100%); border-radius: 12px; padding: 18px; margin-top: 15px; border-left: 3px solid var(--admin-primary);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="background: var(--admin-gradient); color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">管理员处理结果</span>
+                            <small style="color: var(--text-secondary); font-size: 0.85rem;" th:text="${dispute.resolvedAt != null ? #temporals.format(dispute.resolvedAt, 'yyyy-MM-dd HH:mm') : ''}">处理时间</small>
+                        </div>
+                        <p style="color: #475569; line-height: 1.7; margin: 0; font-size: 0.95rem;" th:text="${dispute.adminResponse}">管理员处理内容</p>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid rgba(220, 38, 38, 0.1); padding-top: 20px; margin-top: 20px;">
+                        <button th:if="${dispute.status == 'PENDING' or dispute.status == 'PROCESSING'}" class="btn-action btn-primary" th:attr="onclick='openResolveModal(' + ${dispute.id} + ')'">
+                            <i class="bi bi-check-circle"></i>
+                            处理纠纷
+                        </button>
+                        <a th:href="@{/admin/disputes/{id}(id=${dispute.id})}" class="btn-action btn-info">
+                            <i class="bi bi-eye"></i>
+                            查看详情
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${disputes == null or disputes.empty}" class="empty-state">
+            <i class="bi bi-exclamation-triangle"></i>
+            <h5>暂无纠纷记录</h5>
+            <p>用户与商家之间的纠纷将在这里显示</p>
+        </div>
+    </div>
+    
+    <!-- 处理纠纷弹窗 -->
+    <div id="resolveModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; max-width: 90%; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+            <div style="padding: 25px; border-bottom: 1px solid rgba(220, 38, 38, 0.2); display: flex; justify-content: space-between; align-items: center;">
+                <h5 style="margin: 0; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
+                    <i class="bi bi-shield-check" style="color: var(--admin-primary);"></i>
+                    处理纠纷
+                </h5>
+                <button onclick="closeResolveModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div style="padding: 25px;">
+                <form id="resolveForm" th:action="@{/admin/disputes/resolve}" method="post">
+                    <input type="hidden" name="disputeId" id="resolveDisputeId">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: block;">处理结果</label>
+                        <select name="resolution" style="width: 100%; padding: 12px 16px; border: 2px solid rgba(220, 38, 38, 0.2); border-radius: 12px; font-size: 0.95rem;" required>
+                            <option value="USER_WIN">用户胜诉</option>
+                            <option value="BUSINESS_WIN">商家胜诉</option>
+                            <option value="COMPROMISE">双方妥协</option>
+                            <option value="CLOSED">关闭纠纷</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-weight: 600; color: var(--text-primary); margin-bottom: 10px; display: block;">处理说明</label>
+                        <textarea name="adminResponse" placeholder="请详细说明处理结果和理由..." style="width: 100%; padding: 12px 16px; border: 2px solid rgba(220, 38, 38, 0.2); border-radius: 12px; font-size: 0.95rem; resize: vertical; min-height: 150px;" required></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" class="btn-action btn-outline" onclick="closeResolveModal()">取消</button>
+                        <button type="submit" class="btn-action btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            提交处理
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterDisputes(status) {
+            const disputes = document.querySelectorAll('.dispute-item');
+            disputes.forEach(dispute => {
+                const disputeStatus = dispute.dataset.status;
+                if (status === 'all') {
+                    dispute.style.display = 'block';
+                } else {
+                    dispute.style.display = disputeStatus === status ? 'block' : 'none';
+                }
+            });
+        }
+        
+        function openResolveModal(disputeId) {
+            document.getElementById('resolveDisputeId').value = disputeId;
+            document.getElementById('resolveModal').style.display = 'block';
+        }
+        
+        function closeResolveModal() {
+            document.getElementById('resolveModal').style.display = 'none';
+        }
+        
+        // 点击弹窗外部关闭
+        document.getElementById('resolveModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResolveModal();
+            }
+        });
+    </script>
+</div>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确认预订 - Luxury Stay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0a0a12;
+            --primary-light: #12121f;
+            --secondary-color: #d4af37;
+            --secondary-dark: #b8944d;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --text-white: #ffffff;
+            --text-gray: #374151;
+            --text-light: #6b7280;
+            --text-muted: #9ca3af;
+            --bg-dark: #0a0a12;
+            --bg-light: #fafafa;
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.18);
+            --transition-normal: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0f0f1a 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: var(--text-white);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 18, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .navbar-brand {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-white) !important;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            padding: 0.75rem 1.25rem !important;
+            border-radius: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--secondary-color) !important;
+            background: rgba(212, 175, 55, 0.08);
+        }
+
+        .booking-container {
+            padding: 80px 0;
+        }
+
+        .section-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 45px;
+            transition: var(--transition-normal);
+        }
+
+        .section-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            font-size: 1.3rem;
+        }
+
+        .hotel-info-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .hotel-name {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-white);
+            margin-bottom: 8px;
+        }
+
+        .hotel-location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+
+        .hotel-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .booking-summary {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .booking-summary li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 1rem;
+        }
+
+        .booking-summary li:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .summary-value {
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        .summary-highlight {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .price-breakdown {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: 0.95rem;
+        }
+
+        .price-label {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .price-value {
+            color: var(--text-white);
+        }
+
+        .total-row {
+            padding-top: 20px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .total-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-white);
+        }
+
+        .total-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: var(--text-white);
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .payment-option {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .payment-option:hover,
+        .payment-option.selected {
+            border-color: var(--secondary-color);
+            background: rgba(212, 175, 55, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .payment-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .payment-name {
+            font-weight: 600;
+            color: #ffffff !important;
+            font-size: 1rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%);
+            color: var(--text-white);
+            padding: 20px 50px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            border: none;
+            transition: var(--transition-normal);
+            box-shadow: 0 8px 28px rgba(212, 175, 55, 0.4);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 40px rgba(212, 175, 55, 0.5);
+            color: var(--text-white);
+        }
+
+        .guarantee-badge {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .guarantee-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--success-color) 0%, #16a34a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .guarantee-text {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .guarantee-text strong {
+            color: var(--success-color);
+        }
+
+        .footer {
+            background: rgba(5, 5, 8, 0.8);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-brand {
+            font-family: 'Noto Serif SC', Georgia, serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--text-white);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            margin-right: 20px;
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.9rem;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">LUXURY STAY</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">首页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hotels">酒店</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">关于我们</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">联系我们</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="booking-container">
+        <div class="container">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl font-bold mb-4 animate-fadeInUp" style="font-family: 'Noto Serif SC', Georgia, serif;">确认您的预订</h1>
+                <p class="text-lg text-white/70 animate-fadeInUp delay-1">请仔细核对以下信息，确保预订无误</p>
+            </div>
+
+            <div class="row gap-6">
+                <div class="col-lg-8">
+                    <div class="section-card animate-fadeInUp delay-2">
+                        <h3 class="section-title">
+                            <i class="fas fa-hotel"></i>
+                            酒店信息
+                        </h3>
+                        <div class="hotel-info-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <img th:src="${hotel.image}" alt="${hotel.name}" class="hotel-image">
+                                </div>
+                                <div class="col-md-8">
+                                    <h2 class="hotel-name" th:text="${hotel.name}">豪华度假酒店</h2>
+                                    <div class="hotel-location">
+                                        <i class="fas fa-map-marker-alt" style="color: var(--secondary-color);"></i>
+                                        <span th:text="${hotel.location}">北京市朝阳区</span>
+                                    </div>
+                                    <div class="mt-4">
+                                        <span class="star-badge" style="background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-dark) 100%); padding: 8px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 600;">
+                                            <i class="fas fa-star"></i> 五星级
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card animate-fadeInUp delay-3 mt-6">
+                        <h3 class="section-title">
+                            <i class="fas fa-user"></i>
+                            宾客信息
+                        </h3>
+                        <form th:action="@{/booking/confirm}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" th:name="hotelId" th:value="${hotel.id}">
+                            <input type="hidden" th:name="roomType" th:value="${roomType}">
+                            <input type="hidden" th:name="checkIn" th:value="${checkIn}">
+                            <input type="hidden" th:name="checkOut" th:value="${checkOut}">
+                            <input type="hidden" th:name="guests" th:value="${guests}">
+
+                            <div class="row gap-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-user"></i>
+                                        姓名 *
+                                    </label>
+                                    <input type="text" class="form-control" name="guestName" required placeholder="请输入您的姓名">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-phone"></i>
+                                        联系电话 *
+                                    </label>
+                                    <input type="tel" class="form-control" name="phone" required placeholder="请输入联系电话">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-envelope"></i>
+                                        电子邮箱
+                                    </label>
+                                    <input type="email" class="form-control" name="email" placeholder="请输入电子邮箱">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-id-card"></i>
+                                        身份证号码 *
+                                    </label>
+                                    <input type="text" class="form-control" name="idCard" required placeholder="请输入身份证号码">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <i class="fas fa-message-square"></i>
+                                        特殊要求
+                                    </label>
+                                    <textarea class="form-control" name="specialRequests" rows="3" placeholder="如有特殊要求，请在此说明（如：无烟房、婴儿床等）"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <h3 class="section-title">
+                                    <i class="fas fa-credit-card"></i>
+                                    支付方式
+                                </h3>
+                                <div class="payment-options">
+                                    <div class="payment-option selected" onclick="selectPayment('wechat')">
+                                        <div class="payment-icon">
+                                            <i class="fab fa-weixin" style="color: #07C160;"></i>
+                                        </div>
+                                        <span class="payment-name">微信支付</span>
+                                        <i class="fas fa-check ml-auto" style="color: var(--secondary-color);"></i>
+                                    </div>
+                                    <div class="payment-option" onclick="selectPayment('alipay')">
+                                        <div class="payment-icon">
+                                            <i class="fab fa-alipay" style="color: #1677FF;"></i>
+                                        </div>
+                                        <span class="payment-name">支付宝</span>
+                                    </div>
+                                    <div class="payment-option" onclick="selectPayment('card')">
+                                        <div class="payment-icon">
+                                            <i class="fas fa-credit-card" style="color: var(--secondary-color);"></i>
+                                        </div>
+                                        <span class="payment-name">银行卡</span>
+                                    </div>
+                                    <div class="payment-option" onclick="selectPayment('cash')">
+                                        <div class="payment-icon">
+                                            <i class="fas fa-wallet" style="color: #f59e0b;"></i>
+                                        </div>
+                                        <span class="payment-name">到店支付</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="paymentMethod" value="wechat">
+                            </div>
+
+                            <button type="submit" class="btn-primary-custom mt-8">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                确认预订并支付
+                            </button>
+                        </form>
+
+                        <div class="guarantee-badge">
+                            <div class="guarantee-icon">
+                                <i class="fas fa-shield-check"></i>
+                            </div>
+                            <div class="guarantee-text">
+                                <strong>安全保障承诺</strong><br>
+                                您的支付信息经过加密处理，我们承诺保护您的隐私安全
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="section-card animate-fadeInUp delay-4 sticky-top" style="top: 110px;">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            预订摘要
+                        </h3>
+                        <ul class="booking-summary">
+                            <li>
+                                <span class="summary-label">入住日期</span>
+                                <span class="summary-value" th:text="${checkIn}">2024-01-15</span>
+                            </li>
+                            <li>
+                                <span class="summary-label">退房日期</span>
+                                <span class="summary-value" th:text="${checkOut}">2024-01-18</span>
+                            </li>
+                            <li>
+                                <span class="summary-label">入住天数</span>
+                                <span class="summary-value summary-highlight" th:text="${nights} + ' 晚'">3 晚</span>
+                            </li>
+                            <li>
+                                <span class="summary-label">房型</span>
+                                <span class="summary-value" th:text="${roomType}">豪华大床房</span>
+                            </li>
+                            <li>
+                                <span class="summary-label">宾客人数</span>
+                                <span class="summary-value" th:text="${guests} + ' 位'">2 位</span>
+                            </li>
+                        </ul>
+
+                        <div class="price-breakdown mt-4">
+                            <div class="price-row">
+                                <span class="price-label">房费（含服务费）</span>
+                                <span class="price-value" th:text="'¥' + ${roomRate} + ' x ' + ${nights} + ' 晚'">¥1,288 x 3 晚</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price-label">税费</span>
+                                <span class="price-value" th:text="'¥' + ${tax}">¥386</span>
+                            </div>
+                            <div class="price-row">
+                                <span class="price-label">押金</span>
+                                <span class="price-value">¥500</span>
+                            </div>
+                            <div class="price-row total-row">
+                                <span class="total-label">总计</span>
+                                <span class="total-value" th:text="'¥' + ${total}">¥4,750</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-4 bg-white/5 rounded-16">
+                            <p class="text-sm text-white/60">
+                                <i class="fas fa-info-circle mr-2" style="color: var(--secondary-color);"></i>
+                                预订确认后，您将收到确认邮件和短信通知
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand mb-4">LUXURY STAY</div>
+            <div class="footer-links">
+                <a href="/">首页</a>
+                <a href="/hotels">酒店</a>
+                <a href="/about">关于我们</a>
+                <a href="/contact">联系我们</a>
+                <a href="/privacy">隐私政策</a>
+                <a href="/terms">服务条款</a>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2024 Luxury Stay. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            document.querySelector('input[name="paymentMethod"]').value = method;
+        }
+    </script>
+</body>
+</html>

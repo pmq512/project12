@@ -1,0 +1,169 @@
+<div th:fragment="content" class="font-sans">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">总订单数</span>
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+            </div>
+            <div class="stat-value" th:text="${totalBookings}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i>
+                +12.5% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">本月订单</span>
+                <div class="stat-icon"><i class="bi bi-calendar-month"></i></div>
+            </div>
+            <div class="stat-value" th:text="${monthlyBookings}">0</div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i>
+                +8.3% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">总收入</span>
+                <div class="stat-icon"><i class="bi bi-wallet"></i></div>
+            </div>
+            <div class="stat-value">¥<span th:text="${totalRevenue}">0</span></div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i>
+                +15.7% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">平台抽成</span>
+                <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+            </div>
+            <div class="stat-value">-¥<span th:text="${totalCommission}">0</span></div>
+            <div class="stat-change negative">
+                <i class="bi bi-percent"></i>
+                10% 抽成比例
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">实际收入</span>
+                <div class="stat-icon"><i class="bi bi-bank"></i></div>
+            </div>
+            <div class="stat-value">¥<span th:text="${businessIncome}">0</span></div>
+            <div class="stat-change positive">
+                <i class="bi bi-trending-up"></i>
+                +14.2% 较上月
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">待处理评论</span>
+                <div class="stat-icon"><i class="bi bi-chat-left-text"></i></div>
+            </div>
+            <div class="stat-value" th:text="${pendingReviewsCount}">0</div>
+            <div class="stat-change negative" th:if="${pendingReviewsCount > 0}">
+                <i class="bi bi-alert-circle"></i>
+                有待审核评论
+            </div>
+            <div class="stat-change positive" th:unless="${pendingReviewsCount > 0}">
+                <i class="bi bi-check-circle"></i>
+                全部已审核
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="data-table">
+                <div class="data-table-header">
+                    <h5><i class="bi bi-clock"></i>最近订单</h5>
+                    <a href="/business/bookings" class="btn-action btn-outline">
+                        <i class="bi bi-eye"></i>查看全部
+                    </a>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>酒店名称</th>
+                            <th>客户</th>
+                            <th>入住日期</th>
+                            <th>状态</th>
+                            <th>金额</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${recentBookings}">
+                            <td>#<span th:text="${booking.id}"></span></td>
+                            <td th:text="${booking.hotelName}"></td>
+                            <td th:text="${booking.guestName}"></td>
+                            <td th:text="${booking.checkIn}"></td>
+                            <td>
+                                <span class="status-badge" th:classappend="${'status-' + booking.status.toLowerCase()}" 
+                                      th:text="${booking.status}"></span>
+                            </td>
+                            <td>¥<span th:text="${booking.totalPrice}"></span></td>
+                            <td>
+                                <a th:href="@{/business/bookings/{id}(id=${booking.id})}" 
+                                   class="btn-action btn-primary">
+                                    <i class="bi bi-eye"></i>详情
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${recentBookings.isEmpty()}">
+                            <td colspan="7" class="empty-state">
+                                <i class="bi bi-calendar-x"></i>
+                                <h5>暂无订单</h5>
+                                <p>还没有订单记录</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="data-table">
+                <div class="data-table-header">
+                    <h5><i class="bi bi-star"></i>待审核评论</h5>
+                    <a href="/business/reviews" class="btn-action btn-outline">
+                        <i class="bi bi-arrow-right"></i>管理评论
+                    </a>
+                </div>
+                <div class="p-4">
+                    <div th:each="review : ${pendingReviewList}" class="mb-4 pb-4 border-bottom border-light">
+                        <div class="d-flex align-items-center justify-between mb-2">
+                            <span class="font-weight-semibold" th:text="${review.hotelName}"></span>
+                            <div class="rating-stars">
+                                <i th:each="i : ${#numbers.sequence(1, 5)}" 
+                                   th:class="${i <= review.rating ? 'bi-star-fill' : 'bi-star'}"></i>
+                            </div>
+                        </div>
+                        <p class="text-secondary text-sm mb-2" th:text="${review.content}"></p>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/business/reviews/{id}/approve(id=${review.id})}" 
+                               class="btn-action btn-success btn-sm">
+                                <i class="bi bi-check"></i>通过
+                            </a>
+                            <a th:href="@{/business/reviews/{id}/reject(id=${review.id})}" 
+                               class="btn-action btn-danger btn-sm">
+                                <i class="bi bi-x"></i>拒绝
+                            </a>
+                        </div>
+                    </div>
+                    <div th:if="${pendingReviewList.isEmpty()}" class="empty-state">
+                        <i class="bi bi-check-circle"></i>
+                        <h5>暂无待审核评论</h5>
+                        <p>所有评论均已审核通过</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

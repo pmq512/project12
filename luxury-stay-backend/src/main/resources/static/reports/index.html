@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxuryStay 数据报表</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #c9a962;
+            --success-color: #16a34a;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --bg-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Noto Serif SC', 'Songti SC', serif;
+            background-color: var(--bg-color);
+        }
+        
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2d2d44 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color) !important;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stat-icon.primary { background: linear-gradient(135deg, var(--primary-color) 0%, #2d2d44 100%); }
+        .stat-icon.secondary { background: linear-gradient(135deg, var(--secondary-color) 0%, #b8944d 100%); }
+        .stat-icon.success { background: linear-gradient(135deg, var(--success-color) 0%, #15803d 100%); }
+        .stat-icon.warning { background: linear-gradient(135deg, var(--warning-color) 0%, #ca8a04 100%); }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+        
+        .chart-box {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 24px;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #6c757d;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 12px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(201, 169, 98, 0.1);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: white;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+        
+        .table-custom {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2d2d44 100%);
+            color: white;
+        }
+        
+        .table-custom th {
+            font-weight: 500;
+            padding: 16px;
+            border: none;
+        }
+        
+        .table-custom td {
+            padding: 16px;
+            vertical-align: middle;
+        }
+        
+        .rank-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%); }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%); }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); }
+        .rank-other { background: #6c757d; }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .btn-back {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            background: #b8944d;
+            color: white;
+            transform: translateX(-4px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-custom navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fa-solid fa-hotel me-2"></i>LuxuryStay
+            </a>
+            <span class="navbar-text text-white">
+                <i class="fa-solid fa-chart-line me-2"></i>数据报表中心
+            </span>
+            <a href="/" class="btn btn-back">
+                <i class="fa-solid fa-arrow-left me-2"></i>返回首页
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Tab切换 -->
+        <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="fa-solid fa-globe me-2"></i>平台概览
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="merchants-tab" data-bs-toggle="tab" data-bs-target="#merchants" type="button" role="tab">
+                    <i class="fa-solid fa-store me-2"></i>商家数据
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                    <i class="fa-solid fa-users me-2"></i>用户数据
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="hotels-tab" data-bs-toggle="tab" data-bs-target="#hotels" type="button" role="tab">
+                    <i class="fa-solid fa-building me-2"></i>酒店数据
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab内容区域 -->
+        <div class="tab-content" id="reportTabsContent">
+            
+            <!-- 平台概览 -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <h3 class="section-title">平台核心数据</h3>
+                
+                <!-- 统计卡片 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon primary me-3">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalUsers">0</p>
+                                    <p class="stat-label">总用户数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon secondary me-3">
+                                    <i class="fa-solid fa-store"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalMerchants">0</p>
+                                    <p class="stat-label">总商家数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon success me-3">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalHotels">0</p>
+                                    <p class="stat-label">总酒店数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon warning me-3">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalOrders">0</p>
+                                    <p class="stat-label">总订单数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon primary me-3">
+                                    <i class="fa-solid fa-yen-sign"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalRevenue">0</p>
+                                    <p class="stat-label">总收入(万元)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon secondary me-3">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgRating">0</p>
+                                    <p class="stat-label">平均评分</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">收入趋势（近12个月）</h5>
+                            <div id="revenueTrendChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">订单趋势（近12个月）</h5>
+                            <div id="orderTrendChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">用户增长趋势</h5>
+                            <div id="userGrowthChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">目的地酒店分布</h5>
+                            <div id="destinationChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="table-custom">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>月份</th>
+                                    <th>订单数</th>
+                                    <th>收入(元)</th>
+                                    <th>新用户数</th>
+                                    <th>新商家数</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewTableBody">
+                                <!-- 数据由JS填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 商家数据 -->
+            <div class="tab-pane fade" id="merchants" role="tabpanel">
+                <h3 class="section-title">商家业绩分析</h3>
+                
+                <!-- 统计卡片 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon primary me-3">
+                                    <i class="fa-solid fa-store"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="activeMerchants">0</p>
+                                    <p class="stat-label">活跃商家数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon secondary me-3">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="newMerchantsThisMonth">0</p>
+                                    <p class="stat-label">本月新增商家</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon success me-3">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgHotelsPerMerchant">0</p>
+                                    <p class="stat-label">商家平均酒店数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon warning me-3">
+                                    <i class="fa-solid fa-yen-sign"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgRevenuePerMerchant">0</p>
+                                    <p class="stat-label">商家平均收入(元)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-8">
+                        <div class="chart-container">
+                            <h5 class="mb-3">商家业绩排行 TOP10</h5>
+                            <div id="merchantRankChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">商家活跃度分布</h5>
+                            <div id="merchantActivityChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="table-custom">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>商家名称</th>
+                                    <th>公司名</th>
+                                    <th>酒店数</th>
+                                    <th>订单数</th>
+                                    <th>收入(元)</th>
+                                    <th>平均评分</th>
+                                </tr>
+                            </thead>
+                            <tbody id="merchantTableBody">
+                                <!-- 数据由JS填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户数据 -->
+            <div class="tab-pane fade" id="users" role="tabpanel">
+                <h3 class="section-title">用户行为分析</h3>
+                
+                <!-- 统计卡片 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon primary me-3">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="activeUsers">0</p>
+                                    <p class="stat-label">活跃用户数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon secondary me-3">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="newUsersThisMonth">0</p>
+                                    <p class="stat-label">本月新增用户</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon success me-3">
+                                    <i class="fa-solid fa-shopping-cart"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgOrdersPerUser">0</p>
+                                    <p class="stat-label">用户平均订单数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon warning me-3">
+                                    <i class="fa-solid fa-wallet"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgSpendingPerUser">0</p>
+                                    <p class="stat-label">用户平均消费(元)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">用户增长趋势</h5>
+                            <div id="userTrendChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-3">用户消费分布</h5>
+                            <div id="userSpendingChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="table-custom">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>月份</th>
+                                    <th>新增用户</th>
+                                    <th>活跃用户</th>
+                                    <th>总订单数</th>
+                                    <th>总消费(元)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <!-- 数据由JS填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 酒店数据 -->
+            <div class="tab-pane fade" id="hotels" role="tabpanel">
+                <h3 class="section-title">酒店运营数据</h3>
+                
+                <!-- 统计卡片 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon primary me-3">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="totalHotelsStat">0</p>
+                                    <p class="stat-label">总酒店数</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon secondary me-3">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="fiveStarHotels">0</p>
+                                    <p class="stat-label">五星级酒店</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon success me-3">
+                                    <i class="fa-solid fa-tag"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgPrice">0</p>
+                                    <p class="stat-label">平均房价(元)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center">
+                                <div class="stat-icon warning me-3">
+                                    <i class="fa-solid fa-percent"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-value" id="avgOccupancyRate">0%</p>
+                                    <p class="stat-label">平均入住率</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">酒店星级分布</h5>
+                            <div id="hotelStarChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">酒店价格分布</h5>
+                            <div id="hotelPriceChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="chart-container">
+                            <h5 class="mb-3">热门目的地 TOP10</h5>
+                            <div id="topDestinationsChart" class="chart-box"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据表格 -->
+                <div class="table-custom">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>目的地</th>
+                                    <th>酒店数</th>
+                                    <th>五星</th>
+                                    <th>四星</th>
+                                    <th>三星</th>
+                                    <th>平均房价(元)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hotelTableBody">
+                                <!-- 数据由JS填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script>
+        // 报表数据
+        const reportData = {
+            overview: {
+                stats: {
+                    totalUsers: 12580,
+                    totalMerchants: 156,
+                    totalHotels: 892,
+                    totalOrders: 45678,
+                    totalRevenue: 1258,
+                    avgRating: 4.6
+                },
+                monthlyData: [
+                    { month: '2024-01', orders: 3456, revenue: 890000, newUsers: 1234, newMerchants: 12 },
+                    { month: '2024-02', orders: 3890, revenue: 1020000, newUsers: 1456, newMerchants: 15 },
+                    { month: '2024-03', orders: 4234, revenue: 1150000, newUsers: 1678, newMerchants: 18 },
+                    { month: '2024-04', orders: 4567, revenue: 1230000, newUsers: 1890, newMerchants: 20 },
+                    { month: '2024-05', orders: 4890, revenue: 1340000, newUsers: 2012, newMerchants: 22 },
+                    { month: '2024-06', orders: 5123, revenue: 1450000, newUsers: 2134, newMerchants: 25 }
+                ],
+                destinationData: [
+                    { name: '北京', value: 89 },
+                    { name: '上海', value: 78 },
+                    { name: '广州', value: 67 },
+                    { name: '深圳', value: 56 },
+                    { name: '杭州', value: 45 },
+                    { name: '成都', value: 43 },
+                    { name: '重庆', value: 38 },
+                    { name: '西安', value: 35 },
+                    { name: '南京', value: 32 },
+                    { name: '武汉', value: 28 }
+                ]
+            },
+            merchants: {
+                stats: {
+                    activeMerchants: 142,
+                    newMerchantsThisMonth: 8,
+                    avgHotelsPerMerchant: 5.7,
+                    avgRevenuePerMerchant: 80641
+                },
+                topMerchants: [
+                    { rank: 1, name: '张三', company: '精品酒店集团', hotels: 12, orders: 5678, revenue: 1580000, rating: 4.7 },
+                    { rank: 2, name: '李四', company: '奢华酒店管理', hotels: 10, orders: 4567, revenue: 1230000, rating: 4.6 },
+                    { rank: 3, name: '王五', company: '高端度假酒店', hotels: 8, orders: 3890, revenue: 980000, rating: 4.8 },
+                    { rank: 4, name: '赵六', company: '城市商务酒店', hotels: 7, orders: 3456, revenue: 890000, rating: 4.5 },
+                    { rank: 5, name: '钱七', company: '精品民宿运营', hotels: 6, orders: 3123, revenue: 780000, rating: 4.7 },
+                    { rank: 6, name: '孙八', company: '度假村管理', hotels: 5, orders: 2789, revenue: 670000, rating: 4.6 },
+                    { rank: 7, name: '周九', company: '连锁酒店集团', hotels: 4, orders: 2345, revenue: 560000, rating: 4.4 },
+                    { rank: 8, name: '吴十', company: '精品公寓运营', hotels: 4, orders: 2123, revenue: 490000, rating: 4.5 },
+                    { rank: 9, name: '郑十一', company: '高端会所管理', hotels: 3, orders: 1890, revenue: 420000, rating: 4.8 },
+                    { rank: 10, name: '王十二', company: '特色酒店运营', hotels: 3, orders: 1678, revenue: 380000, rating: 4.6 }
+                ]
+            },
+            users: {
+                stats: {
+                    activeUsers: 8456,
+                    newUsersThisMonth: 1234,
+                    avgOrdersPerUser: 3.6,
+                    avgSpendingPerUser: 1000
+                },
+                monthlyData: [
+                    { month: '2024-01', newUsers: 1234, activeUsers: 6789, orders: 3456, spending: 890000 },
+                    { month: '2024-02', newUsers: 1456, activeUsers: 7123, orders: 3890, spending: 1020000 },
+                    { month: '2024-03', newUsers: 1678, activeUsers: 7456, orders: 4234, spending: 1150000 },
+                    { month: '2024-04', newUsers: 1890, activeUsers: 7789, orders: 4567, spending: 1230000 },
+                    { month: '2024-05', newUsers: 2012, activeUsers: 8123, orders: 4890, spending: 1340000 },
+                    { month: '2024-06', newUsers: 2134, activeUsers: 8456, orders: 5123, spending: 1450000 }
+                ]
+            },
+            hotels: {
+                stats: {
+                    totalHotels: 892,
+                    fiveStarHotels: 234,
+                    avgPrice: 880,
+                    avgOccupancyRate: 75
+                },
+                starDistribution: [
+                    { name: '五星', value: 234 },
+                    { name: '四星', value: 345 },
+                    { name: '三星', value: 313 }
+                ],
+                priceDistribution: [
+                    { name: '500以下', value: 156 },
+                    { name: '500-800', value: 234 },
+                    { name: '800-1200', value: 312 },
+                    { name: '1200-2000', value: 134 },
+                    { name: '2000以上', value: 56 }
+                ],
+                topDestinations: [
+                    { rank: 1, name: '北京', hotels: 89, fiveStar: 23, fourStar: 34, threeStar: 32, avgPrice: 1280 },
+                    { rank: 2, name: '上海', hotels: 78, fiveStar: 21, fourStar: 29, threeStar: 28, avgPrice: 1180 },
+                    { rank: 3, name: '广州', hotels: 67, fiveStar: 18, fourStar: 25, threeStar: 24, avgPrice: 980 },
+                    { rank: 4, name: '深圳', hotels: 56, fiveStar: 15, fourStar: 21, threeStar: 20, avgPrice: 1080 },
+                    { rank: 5, name: '杭州', hotels: 45, fiveStar: 12, fourStar: 17, threeStar: 16, avgPrice: 880 },
+                    { rank: 6, name: '成都', hotels: 43, fiveStar: 11, fourStar: 16, threeStar: 16, avgPrice: 780 },
+                    { rank: 7, name: '重庆', hotels: 38, fiveStar: 10, fourStar: 14, threeStar: 14, avgPrice: 680 },
+                    { rank: 8, name: '西安', hotels: 35, fiveStar: 9, fourStar: 13, threeStar: 13, avgPrice: 780 },
+                    { rank: 9, name: '南京', hotels: 32, fiveStar: 8, fourStar: 12, threeStar: 12, avgPrice: 880 },
+                    { rank: 10, name: '武汉', hotels: 28, fiveStar: 7, fourStar: 10, threeStar: 11, avgPrice: 680 }
+                ]
+            }
+        };
+
+        // 图表实例
+        let charts = {};
+
+        // 初始化平台概览数据
+        function initOverviewData() {
+            const data = reportData.overview;
+            
+            // 更新统计卡片
+            document.getElementById('totalUsers').textContent = data.stats.totalUsers.toLocaleString();
+            document.getElementById('totalMerchants').textContent = data.stats.totalMerchants.toLocaleString();
+            document.getElementById('totalHotels').textContent = data.stats.totalHotels.toLocaleString();
+            document.getElementById('totalOrders').textContent = data.stats.totalOrders.toLocaleString();
+            document.getElementById('totalRevenue').textContent = data.stats.totalRevenue.toLocaleString();
+            document.getElementById('avgRating').textContent = data.stats.avgRating;
+            
+            // 填充表格
+            const tableBody = document.getElementById('overviewTableBody');
+            tableBody.innerHTML = data.monthlyData.map(item => `
+                <tr>
+                    <td>${item.month}</td>
+                    <td>${item.orders.toLocaleString()}</td>
+                    <td>¥${item.revenue.toLocaleString()}</td>
+                    <td>${item.newUsers.toLocaleString()}</td>
+                    <td>${item.newMerchants}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 初始化商家数据
+        function initMerchantData() {
+            const data = reportData.merchants;
+            
+            // 更新统计卡片
+            document.getElementById('activeMerchants').textContent = data.stats.activeMerchants.toLocaleString();
+            document.getElementById('newMerchantsThisMonth').textContent = data.stats.newMerchantsThisMonth;
+            document.getElementById('avgHotelsPerMerchant').textContent = data.stats.avgHotelsPerMerchant;
+            document.getElementById('avgRevenuePerMerchant').textContent = '¥' + data.stats.avgRevenuePerMerchant.toLocaleString();
+            
+            // 填充表格
+            const tableBody = document.getElementById('merchantTableBody');
+            tableBody.innerHTML = data.topMerchants.map(item => {
+                const rankClass = item.rank <= 3 ? `rank-${item.rank}` : 'rank-other';
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${item.rank}</span></td>
+                        <td>${item.name}</td>
+                        <td>${item.company}</td>
+                        <td>${item.hotels}</td>
+                        <td>${item.orders.toLocaleString()}</td>
+                        <td>¥${item.revenue.toLocaleString()}</td>
+                        <td><span class="text-warning">${item.rating}</span> <i class="fa-solid fa-star text-warning"></i></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 初始化用户数据
+        function initUserData() {
+            const data = reportData.users;
+            
+            // 更新统计卡片
+            document.getElementById('activeUsers').textContent = data.stats.activeUsers.toLocaleString();
+            document.getElementById('newUsersThisMonth').textContent = data.stats.newUsersThisMonth.toLocaleString();
+            document.getElementById('avgOrdersPerUser').textContent = data.stats.avgOrdersPerUser;
+            document.getElementById('avgSpendingPerUser').textContent = '¥' + data.stats.avgSpendingPerUser.toLocaleString();
+            
+            // 填充表格
+            const tableBody = document.getElementById('userTableBody');
+            tableBody.innerHTML = data.monthlyData.map(item => `
+                <tr>
+                    <td>${item.month}</td>
+                    <td>${item.newUsers.toLocaleString()}</td>
+                    <td>${item.activeUsers.toLocaleString()}</td>
+                    <td>${item.orders.toLocaleString()}</td>
+                    <td>¥${item.spending.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 初始化酒店数据
+        function initHotelData() {
+            const data = reportData.hotels;
+            
+            // 更新统计卡片
+            document.getElementById('totalHotelsStat').textContent = data.stats.totalHotels.toLocaleString();
+            document.getElementById('fiveStarHotels').textContent = data.stats.fiveStarHotels.toLocaleString();
+            document.getElementById('avgPrice').textContent = '¥' + data.stats.avgPrice.toLocaleString();
+            document.getElementById('avgOccupancyRate').textContent = data.stats.avgOccupancyRate + '%';
+            
+            // 填充表格
+            const tableBody = document.getElementById('hotelTableBody');
+            tableBody.innerHTML = data.topDestinations.map(item => {
+                const rankClass = item.rank <= 3 ? `rank-${item.rank}` : 'rank-other';
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${item.rank}</span></td>
+                        <td>${item.name}</td>
+                        <td>${item.hotels}</td>
+                        <td>${item.fiveStar}</td>
+                        <td>${item.fourStar}</td>
+                        <td>${item.threeStar}</td>
+                        <td>¥${item.avgPrice.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 收入趋势图
+            const revenueTrendChart = echarts.init(document.getElementById('revenueTrendChart'));
+            const revenueData = reportData.overview.monthlyData;
+            revenueTrendChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: revenueData.map(d => d.month)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '收入(万元)'
+                },
+                series: [{
+                    name: '收入',
+                    type: 'line',
+                    data: revenueData.map(d => (d.revenue / 10000).toFixed(2)),
+                    smooth: true,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(201, 169, 98, 0.3)' },
+                            { offset: 1, color: 'rgba(201, 169, 98, 0.05)' }
+                        ])
+                    },
+                    itemStyle: { color: '#c9a962' }
+                }]
+            });
+            charts.revenueTrend = revenueTrendChart;
+
+            // 订单趋势图
+            const orderTrendChart = echarts.init(document.getElementById('orderTrendChart'));
+            orderTrendChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: revenueData.map(d => d.month)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '订单数'
+                },
+                series: [{
+                    name: '订单数',
+                    type: 'line',
+                    data: revenueData.map(d => d.orders),
+                    smooth: true,
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(26, 26, 46, 0.3)' },
+                            { offset: 1, color: 'rgba(26, 26, 46, 0.05)' }
+                        ])
+                    },
+                    itemStyle: { color: '#1a1a2e' }
+                }]
+            });
+            charts.orderTrend = orderTrendChart;
+
+            // 用户增长图
+            const userGrowthChart = echarts.init(document.getElementById('userGrowthChart'));
+            userGrowthChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: revenueData.map(d => d.month)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '用户数'
+                },
+                series: [{
+                    name: '新用户',
+                    type: 'bar',
+                    data: revenueData.map(d => d.newUsers),
+                    itemStyle: { color: '#16a34a' }
+                }]
+            });
+            charts.userGrowth = userGrowthChart;
+
+            // 目的地分布图
+            const destinationChart = echarts.init(document.getElementById('destinationChart'));
+            const destData = reportData.overview.destinationData;
+            destinationChart.setOption({
+                tooltip: { trigger: 'item' },
+                series: [{
+                    name: '酒店数量',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    data: destData,
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }]
+            });
+            charts.destination = destinationChart;
+
+            // 商家业绩排行图
+            const merchantRankChart = echarts.init(document.getElementById('merchantRankChart'));
+            const merchantData = reportData.merchants.topMerchants;
+            merchantRankChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'value',
+                    name: '收入(万元)'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: merchantData.map(d => d.name).reverse()
+                },
+                series: [{
+                    name: '收入',
+                    type: 'bar',
+                    data: merchantData.map(d => (d.revenue / 10000).toFixed(2)).reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#c9a962' },
+                            { offset: 1, color: '#b8944d' }
+                        ])
+                    }
+                }]
+            });
+            charts.merchantRank = merchantRankChart;
+
+            // 商家活跃度图
+            const merchantActivityChart = echarts.init(document.getElementById('merchantActivityChart'));
+            merchantActivityChart.setOption({
+                tooltip: { trigger: 'item' },
+                series: [{
+                    name: '商家状态',
+                    type: 'pie',
+                    radius: '70%',
+                    data: [
+                        { value: 142, name: '活跃商家' },
+                        { value: 14, name: '非活跃商家' }
+                    ],
+                    itemStyle: {
+                        color: function(params) {
+                            return params.dataIndex === 0 ? '#16a34a' : '#dc2626';
+                        }
+                    }
+                }]
+            });
+            charts.merchantActivity = merchantActivityChart;
+
+            // 用户趋势图
+            const userTrendChart = echarts.init(document.getElementById('userTrendChart'));
+            const userData = reportData.users.monthlyData;
+            userTrendChart.setOption({
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['新增用户', '活跃用户'] },
+                xAxis: {
+                    type: 'category',
+                    data: userData.map(d => d.month)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '用户数'
+                },
+                series: [
+                    {
+                        name: '新增用户',
+                        type: 'line',
+                        data: userData.map(d => d.newUsers),
+                        itemStyle: { color: '#c9a962' }
+                    },
+                    {
+                        name: '活跃用户',
+                        type: 'line',
+                        data: userData.map(d => d.activeUsers),
+                        itemStyle: { color: '#1a1a2e' }
+                    }
+                ]
+            });
+            charts.userTrend = userTrendChart;
+
+            // 用户消费分布图
+            const userSpendingChart = echarts.init(document.getElementById('userSpendingChart'));
+            userSpendingChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: userData.map(d => d.month)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '消费(万元)'
+                },
+                series: [{
+                    name: '消费',
+                    type: 'bar',
+                    data: userData.map(d => (d.spending / 10000).toFixed(2)),
+                    itemStyle: { color: '#d97706' }
+                }]
+            });
+            charts.userSpending = userSpendingChart;
+
+            // 酒店星级分布图
+            const hotelStarChart = echarts.init(document.getElementById('hotelStarChart'));
+            const starData = reportData.hotels.starDistribution;
+            hotelStarChart.setOption({
+                tooltip: { trigger: 'item' },
+                series: [{
+                    name: '星级分布',
+                    type: 'pie',
+                    radius: '70%',
+                    data: starData,
+                    itemStyle: {
+                        color: function(params) {
+                            const colors = ['#c9a962', '#1a1a2e', '#16a34a'];
+                            return colors[params.dataIndex];
+                        }
+                    }
+                }]
+            });
+            charts.hotelStar = hotelStarChart;
+
+            // 酒店价格分布图
+            const hotelPriceChart = echarts.init(document.getElementById('hotelPriceChart'));
+            const priceData = reportData.hotels.priceDistribution;
+            hotelPriceChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: priceData.map(d => d.name)
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '酒店数'
+                },
+                series: [{
+                    name: '酒店数',
+                    type: 'bar',
+                    data: priceData.map(d => d.value),
+                    itemStyle: { color: '#c9a962' }
+                }]
+            });
+            charts.hotelPrice = hotelPriceChart;
+
+            // 热门目的地图
+            const topDestinationsChart = echarts.init(document.getElementById('topDestinationsChart'));
+            const destRankData = reportData.hotels.topDestinations;
+            topDestinationsChart.setOption({
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'value',
+                    name: '酒店数'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: destRankData.map(d => d.name).reverse()
+                },
+                series: [{
+                    name: '酒店数',
+                    type: 'bar',
+                    data: destRankData.map(d => d.hotels).reverse(),
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#1a1a2e' },
+                            { offset: 1, color: '#c9a962' }
+                        ])
+                    }
+                }]
+            });
+            charts.topDestinations = topDestinationsChart;
+        }
+
+        // 窗口大小改变时重新渲染图表
+        window.addEventListener('resize', function() {
+            Object.values(charts).forEach(chart => chart && chart.resize());
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initOverviewData();
+            initMerchantData();
+            initUserData();
+            initHotelData();
+            initCharts();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<div th:fragment="content" class="font-sans">
+    <!-- 消息提示 -->
+    <div th:if="${success}" class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger">
+        <i class="bi bi-exclamation-circle me-2"></i><span th:text="${error}"></span>
+    </div>
+    
+    <!-- 酒店列表 -->
+    <div class="data-table">
+        <div class="data-table-header">
+            <h5><i class="bi bi-building me-2"></i>我的酒店</h5>
+            <div class="d-flex items-center gap-3">
+                <span class="text-white/70 text-sm">共 <span th:text="${hotels.size()}">0</span> 家酒店</span>
+                <a th:href="@{/business/hotels/add}" class="btn btn-primary btn-action">
+                    <i class="bi bi-plus-circle"></i>添加新酒店
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>酒店信息</th>
+                        <th>位置</th>
+                        <th>星级</th>
+                        <th>价格/晚</th>
+                        <th>可用房间</th>
+                        <th>评分</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="hotel : ${hotels}">
+                        <td>
+                            <div class="d-flex align-items-center gap-4">
+                                <img th:src="${hotel.image}" class="rounded-xl" style="width: 80px; height: 60px; object-fit: cover; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
+                                <div>
+                                    <h6 class="font-semibold text-gray-800 mb-1" th:text="${hotel.name}">酒店名称</h6>
+                                    <p class="text-xs text-gray-500 line-clamp-2" th:text="${hotel.description}">酒店描述</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-1 text-gray-600">
+                                <i class="bi bi-map-marker text-gray-400"></i>
+                                <span th:text="${hotel.location}">位置</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-0.5">
+                                <i class="bi bi-star-fill text-warning" th:each="i : ${#numbers.sequence(1, hotel.star)}"></i>
+                                <i class="bi bi-star text-gray-300" th:each="i : ${#numbers.sequence(1, 5 - hotel.star)}"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="font-bold text-lg text-primary">¥<span th:text="${hotel.price}">0</span></div>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <span th:text="${hotel.roomsAvailable}">0</span>
+                                <span class="text-xs text-gray-400">间可用</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-1">
+                                <span class="font-semibold text-success" th:text="${hotel.rating} != null ? hotel.rating : '--'">4.8</span>
+                                <i class="bi bi-star-fill text-warning text-sm"></i>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/business/hotels/edit/{id}(id=${hotel.id})}" class="btn btn-edit btn-action" title="编辑酒店">
+                                    <i class="bi bi-pencil"></i>编辑
+                                </a>
+                                <a th:href="@{/business/hotels/delete/{id}(id=${hotel.id})}" class="btn btn-danger btn-action" 
+                                   onclick="return confirm('确定要删除这家酒店吗？此操作不可撤销。')" title="删除酒店">
+                                    <i class="bi bi-trash"></i>删除
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(hotels)}">
+                        <td colspan="7" class="text-center py-12">
+                            <div class="inline-flex flex-col items-center">
+                                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                    <i class="bi bi-building text-gray-400 text-3xl"></i>
+                                </div>
+                                <p class="text-gray-500 mb-4">暂无酒店数据</p>
+                                <a th:href="@{/business/hotels/add}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>添加第一家酒店
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
