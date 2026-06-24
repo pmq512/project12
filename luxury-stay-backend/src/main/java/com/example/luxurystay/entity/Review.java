@@ -69,7 +69,11 @@ public class Review {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        status = ReviewStatus.PENDING;
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = ReviewStatus.PENDING;
+        }
     }
 }

@@ -26,6 +26,9 @@ public class Hotel {
     @Column(nullable = false)
     private String location;
 
+    @Column(nullable = false)
+    private String city;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

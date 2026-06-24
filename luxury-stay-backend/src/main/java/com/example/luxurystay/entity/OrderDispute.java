@@ -36,6 +36,12 @@ public class OrderDispute {
     @Column(columnDefinition = "TEXT")
     private String evidence;
 
+    @Column(name = "evidence_images", columnDefinition = "TEXT")
+    private String evidenceImages;
+
+    @Column(name = "communication_records", columnDefinition = "TEXT")
+    private String communicationRecords;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DisputeStatus status;

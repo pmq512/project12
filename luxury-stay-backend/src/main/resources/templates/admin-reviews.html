@@ -45,22 +45,32 @@
                             <p class="text-sm text-gray-600 line-clamp-2" th:text="${review.content}"></p>
                         </td>
                         <td>
-                            <span th:if="${review.status == 'PENDING'}" class="status-badge status-processing">待审核</span>
-                            <span th:if="${review.status == 'APPROVED'}" class="status-badge status-resolved">已通过</span>
-                            <span th:if="${review.status == 'REJECTED'}" class="status-badge status-rejected">已驳回</span>
+                            <span th:if="${review.status.name() == 'PENDING'}" class="status-badge status-processing">待审核</span>
+                            <span th:if="${review.status.name() == 'APPROVED'}" class="status-badge status-resolved">已通过</span>
+                            <span th:if="${review.status.name() == 'REJECTED'}" class="status-badge status-rejected">已驳回</span>
                         </td>
                         <td th:text="${review.createdAt}"></td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a th:if="${review.status == 'PENDING'}" 
+                                <a th:if="${review.status.name() == 'PENDING'}" 
                                    th:href="@{/admin/reviews/{id}/approve(id=${review.id})}" 
                                    class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;">
                                     <i class="bi bi-check"></i>通过
                                 </a>
-                                <a th:if="${review.status == 'PENDING'}" 
+                                <a th:if="${review.status.name() == 'PENDING'}" 
                                    th:href="@{/admin/reviews/{id}/reject(id=${review.id})}" 
                                    class="btn-action btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
                                     <i class="bi bi-x"></i>驳回
+                                </a>
+                                <a th:if="${review.status.name() == 'APPROVED'}" 
+                                   th:href="@{/admin/reviews/{id}/reject(id=${review.id})}" 
+                                   class="btn-action btn-danger" style="padding: 6px 12px; font-size: 0.8rem;">
+                                    <i class="bi bi-x-circle"></i>取消
+                                </a>
+                                <a th:if="${review.status.name() == 'REJECTED'}" 
+                                   th:href="@{/admin/reviews/{id}/approve(id=${review.id})}" 
+                                   class="btn-action btn-success" style="padding: 6px 12px; font-size: 0.8rem;">
+                                    <i class="bi bi-check-circle"></i>恢复
                                 </a>
                             </div>
                         </td>

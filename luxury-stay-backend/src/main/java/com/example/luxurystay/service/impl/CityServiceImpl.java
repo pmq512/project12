@@ -92,6 +92,7 @@ public class CityServiceImpl implements CityService {
                 .hotelCount(city.getHotelCount())
                 .rating(city.getRating() != null ? city.getRating() : 4.5)
                 .description(city.getDescription() != null ? city.getDescription() : "欢迎来到" + city.getName() + "，探索这座美丽的城市")
+                .image(city.getImage())
                 .build();
     }
 }

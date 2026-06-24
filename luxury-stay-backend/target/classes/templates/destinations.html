@@ -1342,7 +1342,7 @@
                     <div class="city-card" 
                          th:data-region="${city.region}" th:data-hot="${city.isHot}">
                         <div class="city-card-image">
-                            <img th:src="@{https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image(prompt=${city.name} + '%20city%20landmark%20beautiful%20scenery%20professional%20photography%20tourism')}" 
+                            <img th:src="${city.image != null ? city.image : 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&h=600&fit=crop'}" 
                                  th:alt="${city.name}">
                             <div class="city-card-badges">
                                 <span th:if="${city.isHot}" class="city-card-badge">🔥 热门</span>
@@ -1422,7 +1422,7 @@
             
             <div class="seasonal-cities">
                 <div class="seasonal-card" onclick="window.location.href='/search?location=三亚'">
-                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sanya%20beach%20tropical%20paradise%20sunset%20palm%20trees%20crystal%20clear%20water%20professional&image_size=landscape_4_3" alt="三亚">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" alt="三亚">
                     <div class="seasonal-card-overlay">
                         <span class="seasonal-card-badge">☀️ 冬季推荐</span>
                         <h3 class="seasonal-card-name">
@@ -1438,7 +1438,7 @@
                 </div>
                 
                 <div class="seasonal-card" onclick="window.location.href='/search?location=杭州'">
-                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hangzhou%20west%20lake%20spring%20cherry%20blossom%20traditional%20garden%20beautiful%20reflection&image_size=landscape_4_3" alt="杭州">
+                    <img src="https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800&h=600&fit=crop" alt="杭州">
                     <div class="seasonal-card-overlay">
                         <span class="seasonal-card-badge">🌸 春季推荐</span>
                         <h3 class="seasonal-card-name">
@@ -1454,7 +1454,7 @@
                 </div>
                 
                 <div class="seasonal-card" onclick="window.location.href='/search?location=青岛'">
-                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=qingdao%20coastal%20city%20summer%20beach%20blue%20sky%20ocean%20fresh%20seafood%20professional&image_size=landscape_4_3" alt="青岛">
+                    <img src="https://images.unsplash.com/photo-1548919973-5cef591cdbc9?w=800&h=600&fit=crop" alt="青岛">
                     <div class="seasonal-card-overlay">
                         <span class="seasonal-card-badge">🌊 夏季推荐</span>
                         <h3 class="seasonal-card-name">
@@ -1745,25 +1745,13 @@
                 activeTab.classList.add('active');
             }
             
-            const cards = document.querySelectorAll('.city-card-link');
-            cards.forEach(card => {
-                const cityCard = card.querySelector('.city-card');
-                if (region === 'all') {
-                    card.style.display = 'block';
-                } else if (region === 'hot') {
-                    card.style.display = cityCard.dataset.hot === 'true' ? 'block' : 'none';
-                } else {
-                    let regionMap = {
-                        'north': '华北',
-                        'south': '华南',
-                        'east': '华东',
-                        'central': '华中',
-                        'west': '西部',
-                        'hkmt': '港澳台'
-                    };
-                    card.style.display = cityCard.dataset.region === regionMap[region] ? 'block' : 'none';
-                }
-            });
+            if (region === 'all') {
+                window.location.href = '/destinations';
+            } else if (region === 'hot') {
+                window.location.href = '/destinations?hot=true';
+            } else {
+                window.location.href = '/destinations?region=' + region;
+            }
         }
 
         document.getElementById('citySearch').addEventListener('keypress', function(e) {

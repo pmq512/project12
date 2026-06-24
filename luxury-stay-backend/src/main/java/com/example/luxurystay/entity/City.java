@@ -38,4 +38,7 @@ public class City {
     
     @Column(name = "description", length = 500)
     private String description;
+    
+    @Column(name = "image")
+    private String image;
 }

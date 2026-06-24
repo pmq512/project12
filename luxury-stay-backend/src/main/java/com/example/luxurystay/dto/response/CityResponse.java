@@ -19,4 +19,5 @@ public class CityResponse {
     private Integer hotelCount;
     private Double rating;
     private String description;
+    private String image;
 }
